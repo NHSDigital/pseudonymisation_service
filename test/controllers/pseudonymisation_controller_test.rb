@@ -21,8 +21,42 @@ class PseudonymisationControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test 'should get back a result for each combination of inputs' do
+    post_with_params key_names: [@key1.name], variants: ['1']
+    assert_response :success
+    assert_equal 1, response.parsed_body.length
+
+    post_with_params key_names: [@key1.name], variants: %w[1 2]
+    assert_response :success
+    assert_equal 2, response.parsed_body.length
+  end
+
+  test 'should not allow specificaition of variant 1 without nhsnumber' do
+    post_with_params variants: ['1'], demographics: { nhsnumber: '' }
+    assert_response :success
+
+    post_with_params variants: ['1'], demographics: { birth_date: '2000-01-01' }
+    assert_response :forbidden
+  end
+
+  test 'should not allow specificaition of variant 1 without postcode and DoB' do
+    post_with_params variants: ['2'], demographics: { birth_date: '2000-01-01', postcode: 'W1A 1AA' }
+    assert_response :success
+
+    post_with_params variants: ['2'], demographics: { birth_date: '2000-01-01' }
+    assert_response :forbidden
+
+    post_with_params variants: ['2'], demographics: { postcode: 'W1A 1AA' }
+    assert_response :forbidden
+  end
+
   test 'should not allow non-existent variants to be specified' do
     post_with_params variants: %w[1 wibble]
+    assert_response :forbidden
+  end
+
+  test 'should not allow requests without demographics' do
+    post_with_params demographics: {}
     assert_response :forbidden
   end
 

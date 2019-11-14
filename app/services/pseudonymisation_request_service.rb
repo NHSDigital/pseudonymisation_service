@@ -1,9 +1,11 @@
 # Class responsible for parsing pseudonymisation request
 class PseudonymisationRequestService
   # Can be raised if invalid params supplied:
-  class MissingContext < StandardError; end
-  class UnknownKeyError < StandardError; end
-  class UnknownVariantError < StandardError; end
+  class RequestError < StandardError; end
+  class MissingDemographic < RequestError; end
+  class MissingKey < RequestError; end
+  class UnknownKeyError < RequestError; end
+  class UnknownVariantError < RequestError; end
 
   # Known variants, with the fields required:
   VARIANTS = {
@@ -22,7 +24,7 @@ class PseudonymisationRequestService
   def call
     return [false, @errors] if @errors.length.positive?
 
-    [true, []]
+    [true, results]
   end
 
   private
@@ -30,10 +32,11 @@ class PseudonymisationRequestService
   def validate_params(raise_on_error = false)
     list = []
     begin
-      keys # check keys
       context # check context
+      demographics # checks demographics
+      keys # check keys
       variants # checks variants
-    rescue UnknownKeyError, MissingContext, UnknownVariantError => e
+    rescue RequestError => e
       raise e if raise_on_error
 
       list << e
@@ -53,16 +56,38 @@ class PseudonymisationRequestService
   end
 
   def context
-    params[:context].presence || raise(MissingContext)
+    params[:context].presence || raise(MissingKey, :context)
+  end
+
+  def demographics
+    params[:demographics].presence || raise(MissingKey, :demographics)
   end
 
   def variants
     variants = VARIANTS
     requested = Array(params[:variants])
-    return variants if requested.blank?
 
-    requested.map do |number|
-      variants.fetch(number.to_i) { raise(UnknownVariantError, number) }
+    if requested.present?
+      variants = requested.map.with_object({}) do |number, hash|
+        variant = number.to_i
+        hash[variant] = variants.fetch(variant) { raise(UnknownVariantError, number) }
+      end
+    end
+
+    variants.each do |_number, required_fields|
+      required_fields.each do |field|
+        demographics.key?(field) || raise(MissingDemographic, field)
+      end
+    end
+
+    variants
+  end
+
+  def results
+    keys.flat_map do |key|
+      variants.map do |variant|
+        { key: key, variant: variant, context: context }
+      end
     end
   end
 end
