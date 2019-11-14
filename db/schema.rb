@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_13_150537) do
+ActiveRecord::Schema.define(version: 2019_11_13_163026) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -20,8 +20,13 @@ ActiveRecord::Schema.define(version: 2019_11_13_150537) do
     t.bigint "parent_key_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "key_type", default: 0, null: false
+    t.bigint "start_key_id"
+    t.bigint "end_key_id"
+    t.index ["end_key_id"], name: "index_pseudonymisation_keys_on_end_key_id"
     t.index ["name"], name: "index_pseudonymisation_keys_on_name", unique: true
     t.index ["parent_key_id"], name: "index_pseudonymisation_keys_on_parent_key_id"
+    t.index ["start_key_id"], name: "index_pseudonymisation_keys_on_start_key_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -31,5 +36,7 @@ ActiveRecord::Schema.define(version: 2019_11_13_150537) do
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
+  add_foreign_key "pseudonymisation_keys", "pseudonymisation_keys", column: "end_key_id"
   add_foreign_key "pseudonymisation_keys", "pseudonymisation_keys", column: "parent_key_id"
+  add_foreign_key "pseudonymisation_keys", "pseudonymisation_keys", column: "start_key_id"
 end

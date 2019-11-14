@@ -5,6 +5,8 @@ class PseudonymisationKeyTest < ActiveSupport::TestCase
     @primary1 = pseudonymisation_keys(:primary_one)
     @primary2 = pseudonymisation_keys(:primary_two)
     @secondary1 = pseudonymisation_keys(:repseudo_one)
+    @secondary2 = pseudonymisation_keys(:repseudo_two)
+    @compound1 = pseudonymisation_keys(:compound_one)
   end
 
   test 'should scope primary keys' do
@@ -29,5 +31,60 @@ class PseudonymisationKeyTest < ActiveSupport::TestCase
   test 'should return chain' do
     assert_equal [@primary1], @primary1.chain
     assert_equal [@primary1, @secondary1], @secondary1.chain
+    assert_equal [@primary1, @secondary1], @compound1.chain
+  end
+
+  test 'should be singular by default' do
+    assert @primary1.singular?
+    assert PseudonymisationKey.new.singular?
+  end
+
+  test 'should allow for compound keys' do
+    refute @compound1.singular?
+    assert @compound1.compound?
+
+    assert_equal @primary1, @compound1.start_key
+    assert_equal @secondary1, @compound1.end_key
+  end
+
+  test 'key names should be unique' do
+    key = PseudonymisationKey.new(name: @primary1.name)
+    refute key.valid?
+    assert_includes key.errors.details[:name], error: :taken, value: key.name
+  end
+
+  test 'singular keys should not have a start or an end' do
+    key = PseudonymisationKey.singular.new
+    key.start_key = @primary2
+    key.end_key = @secondary2
+
+    refute key.valid?
+    assert_includes key.errors.details[:start_key], error: :present
+    assert_includes key.errors.details[:end_key], error: :present
+  end
+
+  test 'compound keys require a start and an end' do
+    key = PseudonymisationKey.compound.new(name: 'a compound key')
+    refute key.valid?
+    assert_includes key.errors.details[:start_key], error: :blank
+    assert_includes key.errors.details[:end_key], error: :blank
+
+    key.start_key = @primary2
+    key.end_key = @secondary2
+    assert key.valid?
+  end
+
+  test 'should validate compound key chains' do
+    key = PseudonymisationKey.compound.new(name: 'a wrong compound key')
+    # @primary2 is not an ancestor of @secondary1:
+    key.start_key = @primary2
+    key.end_key = @secondary1
+
+    refute key.valid?
+    assert_includes key.errors.details[:start_key], error: :invalid
+
+    key.start_key = @primary1
+    refute key.valid?
+    assert_includes key.errors.details[:start_key], error: :taken, value: @primary1
   end
 end

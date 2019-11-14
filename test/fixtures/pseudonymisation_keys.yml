@@ -9,3 +9,13 @@ primary_two:
 repseudo_one:
   name: RePseudo Key One
   parent_key: primary_one
+
+repseudo_two:
+  name: RePseudo Key Two
+  parent_key: primary_two
+
+compound_one:
+  key_type: compound
+  name: Compound Key One
+  start_key: primary_one
+  end_key: repseudo_one
