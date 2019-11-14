@@ -22,6 +22,7 @@ class PseudonymisationKey < ApplicationRecord
              inverse_of: :parent_key
   end
 
+  has_many :usage_logs
   has_many :key_grants, dependent: :destroy
   has_many :users, through: :key_grants
 

@@ -4,12 +4,17 @@ The `pseudonymisation_service` project is a Rails API-only application that allo
 
 ## Basic Table Structure
 
-Users can use pseudonymisation keys when a key grant has been given:
+Users can use pseudonymisation keys when a key grant has been given,
+and any usage is then logged.
 
 ```
 +------+      +----------+      +---------------------+
 | User | ---> | KeyGrant | <--- | PseudonymisationKey |
 +------+      +----------+      +---------------------+
+     |                            |
+     |        +----------+        |
+     +------> | UsageLog | <------+
+              +----------+
 ```
 
 ## Authentication
@@ -32,3 +37,5 @@ $ rails users:generate_token
 * use per-env secrets, as per Rails 6 convention
 * integration of `ndr_pseudonymise` into a new service, called by the primary request service object
 * consider refactor/abstraction to a per-row `PseudonymisationResult`, to facilitate future changes for bulk processing.
+* Implement public key encryption of `UsageLog` demographics.
+* Add rake tasks for `PseudonymisationKey` and `KeyGrant` management.

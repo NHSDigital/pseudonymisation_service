@@ -4,6 +4,7 @@
 #   $ rails users:create
 #
 class User < ApplicationRecord
+  has_many :usage_logs
   has_many :key_grants, dependent: :destroy
   has_many :pseudonymisation_keys, through: :key_grants
 
