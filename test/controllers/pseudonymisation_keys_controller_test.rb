@@ -8,7 +8,10 @@ class PseudonymisationKeysControllerTest < ActionDispatch::IntegrationTest
   test 'should list accessible keys' do
     get pseudonymisation_keys_url
     assert_response :success
-    assert_equal PseudonymisationKey.count, response.parsed_body.length
+
+    expected = PseudonymisationKey.accessible_by(current_user.ability).count
+    actual = response.parsed_body.length
+    assert_equal expected, actual
   end
 
   test 'should not allow POST requests' do

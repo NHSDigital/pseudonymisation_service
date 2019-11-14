@@ -13,4 +13,8 @@ class User < ApplicationRecord
     username = Userlist.find_by(token: token)
     find_by(username: username) if username.present?
   end
+
+  def ability
+    Ability.new(self)
+  end
 end

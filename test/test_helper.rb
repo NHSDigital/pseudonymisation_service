@@ -18,12 +18,16 @@ class ActionDispatch::IntegrationTest
 
   private
 
+  attr_reader :current_user
+
   def authenticate_user(user: users(:test_user))
     ActionController::HttpAuthentication::Token.stubs(authenticate: user)
+    @current_user = user
   end
 
   def sign_out
     ActionController::HttpAuthentication::Token.unstub(:authenticate)
+    @current_user = nil
   end
 
   def auth_headers(token: nil)

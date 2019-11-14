@@ -1,7 +1,7 @@
 class PseudonymisationKeysController < ApplicationController
-  # cancancan
-  # jbuilder
+  load_and_authorize_resource
+
   def index
-    render json: PseudonymisationKey.all
+    render json: @pseudonymisation_keys
   end
 end
