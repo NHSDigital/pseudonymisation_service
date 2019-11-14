@@ -20,3 +20,6 @@
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
+
+# Ignore production user credential hash file:
+/config/userlist.yml

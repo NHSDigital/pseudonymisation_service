@@ -45,4 +45,7 @@ Rails.application.configure do
 
   # Raises error for missing translations.
   # config.action_view.raise_on_missing_translations = true
+
+  # Custom userlist, for testing:
+  config.userlist_path = Rails.root.join('config', 'userlist_test.yml')
 end
