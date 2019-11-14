@@ -1,15 +1,28 @@
+require 'highline/import'
+
 namespace :users do
-  desc 'Generates a new token for a user'
-  task generate_token: :environment do
-    require 'highline/import'
-
+  desc 'Creates a new user'
+  task create: :environment do
     username = ask('Username:') { |q| q.validate = /\w+/ }
-    token = SecureRandom.hex(32)
+    user = User.create!(username: username)
 
-    Userlist.add(name: username, token: token)
+    Rake::Task['users:generate_token'].invoke(user.username)
+  end
+
+  desc 'Generates a new token for a user'
+  task :generate_token, [:username] => :environment do |_task, args|
+    username = args.fetch(:username) do
+      ask('Username:') { |q| q.validate = /\w+/ }
+    end
+    user = User.find_by!(username: username)
+
+    raise('no user found with that username!') unless user
+
+    token = SecureRandom.hex(32)
+    Userlist.add(name: user.username, token: token)
 
     puts <<~MESSAGE
-      The following token has been generated for #{username}:
+      The following token has been generated for #{user.username}:
 
       #{token}
 

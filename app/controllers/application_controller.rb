@@ -1,3 +1,4 @@
+# Main controller. Primarily handles abstract site-wide authentication logic.
 class ApplicationController < ActionController::API
   include ActionController::HttpAuthentication::Token::ControllerMethods
 
@@ -11,7 +12,11 @@ class ApplicationController < ActionController::API
 
   def authenticate
     authenticate_or_request_with_http_token do |token, _options|
-      Userlist.find_by(token: token)
+      @current_user = User.retrieve_by(token: token)
     end
+  end
+
+  def current_user
+    @current_user ||= authenticate
   end
 end

@@ -29,7 +29,7 @@ module Userlist
 
   def read
     @list = nil
-    File.exist?(path) ? YAML.load_file(path) : {}
+    File.exist?(path) && YAML.load_file(path) || {}
   end
 
   def write(list)
