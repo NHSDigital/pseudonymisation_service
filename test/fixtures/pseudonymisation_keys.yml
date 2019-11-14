@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+primary_one:
+  name: Primary Key One
+
+primary_two:
+  name: Primary Key Two
+
+repseudo_one:
+  name: RePseudo Key One
+  parent_key: primary_one
