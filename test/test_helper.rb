@@ -1,6 +1,7 @@
 ENV['RAILS_ENV'] ||= 'test'
 require_relative '../config/environment'
 require 'rails/test_help'
+require 'mocha/minitest'
 
 class ActiveSupport::TestCase
   # Run tests in parallel with specified workers
@@ -13,7 +14,17 @@ class ActiveSupport::TestCase
 end
 
 class ActionDispatch::IntegrationTest
+  setup :authenticate_user
+
   private
+
+  def authenticate_user(user: users(:test_user))
+    ActionController::HttpAuthentication::Token.stubs(authenticate: user)
+  end
+
+  def sign_out
+    ActionController::HttpAuthentication::Token.unstub(:authenticate)
+  end
 
   def auth_headers(token: nil)
     token ||= '2e5e5ea81c9e342d8f03b0233770d1006255c418b8156f0a907e69b73e56bcb4'
