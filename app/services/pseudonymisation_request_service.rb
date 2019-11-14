@@ -1,5 +1,5 @@
 # Class responsible for parsing pseudonymisation request
-class Pseudonymiser
+class PseudonymisationRequestService
   # Can be raised if invalid params supplied:
   class MissingContext < StandardError; end
   class UnknownKeyError < StandardError; end
@@ -19,10 +19,10 @@ class Pseudonymiser
     @errors = validate_params(raise_on_error)
   end
 
-  def run
-    raise 'has errors!' if @errors.length.positive?
+  def call
+    return [false, @errors] if @errors.length.positive?
 
-    []
+    [true, []]
   end
 
   private
