@@ -10,10 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_13_163026) do
+ActiveRecord::Schema.define(version: 2019_11_13_173602) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "key_grants", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "pseudonymisation_key_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["pseudonymisation_key_id"], name: "index_key_grants_on_pseudonymisation_key_id"
+    t.index ["user_id", "pseudonymisation_key_id"], name: "index_key_grants_on_user_id_and_pseudonymisation_key_id", unique: true
+    t.index ["user_id"], name: "index_key_grants_on_user_id"
+  end
 
   create_table "pseudonymisation_keys", force: :cascade do |t|
     t.string "name"
@@ -36,6 +46,8 @@ ActiveRecord::Schema.define(version: 2019_11_13_163026) do
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
+  add_foreign_key "key_grants", "pseudonymisation_keys"
+  add_foreign_key "key_grants", "users"
   add_foreign_key "pseudonymisation_keys", "pseudonymisation_keys", column: "end_key_id"
   add_foreign_key "pseudonymisation_keys", "pseudonymisation_keys", column: "parent_key_id"
   add_foreign_key "pseudonymisation_keys", "pseudonymisation_keys", column: "start_key_id"

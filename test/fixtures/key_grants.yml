@@ -1,0 +1,3 @@
+grant_one:
+  user: test_user
+  pseudonymisation_key: primary_one

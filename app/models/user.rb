@@ -4,6 +4,9 @@
 #   $ rails users:create
 #
 class User < ApplicationRecord
+  has_many :key_grants, dependent: :destroy
+  has_many :pseudonymisation_keys, through: :key_grants
+
   # Looks up the given token in the userlist,
   # and returns the corresponding model.
   def self.retrieve_by(token:)

@@ -87,4 +87,8 @@ class PseudonymisationKeyTest < ActiveSupport::TestCase
     refute key.valid?
     assert_includes key.errors.details[:start_key], error: :taken, value: @primary1
   end
+
+  test 'should know which users use has been granted to' do
+    assert_equal [users(:test_user)], pseudonymisation_keys(:primary_one).users
+  end
 end

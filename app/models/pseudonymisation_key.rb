@@ -17,9 +17,13 @@ class PseudonymisationKey < ApplicationRecord
     end
 
     has_many :secondary_keys,
+             dependent: :destroy,
              foreign_key: :parent_key_id,
              inverse_of: :parent_key
   end
+
+  has_many :key_grants, dependent: :destroy
+  has_many :users, through: :key_grants
 
   scope :singular, -> { where(key_type: :singular) }
   scope :compound, -> { where(key_type: :compound) }

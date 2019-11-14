@@ -12,4 +12,8 @@ class UserTest < ActiveSupport::TestCase
   test 'should not return result for junk token' do
     assert_nil User.retrieve_by(token: 'rubbish')
   end
+
+  test 'should know which keys use have been granted of' do
+    assert_equal [pseudonymisation_keys(:primary_one)], users(:test_user).pseudonymisation_keys
+  end
 end
