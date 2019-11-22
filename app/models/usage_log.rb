@@ -17,8 +17,8 @@ class UsageLog < ApplicationRecord
     end
   end
 
-  def demographics
-    private_decrypt(encrypted_demographics)
+  def demographics(private_key:)
+    private_decrypt(encrypted_demographics, private_key)
   end
 
   def demographics=(demographics)
@@ -28,10 +28,15 @@ class UsageLog < ApplicationRecord
   private
 
   def public_encrypt(data)
-    JSON.dump(data)
+    Base64.strict_encode64 public_key.public_encrypt(JSON.dump(data))
   end
 
-  def private_decrypt(ciphertext)
-    JSON.parse(ciphertext).symbolize_keys
+  def private_decrypt(encoded_ciphertext, private_key)
+    json = private_key.private_decrypt Base64.strict_decode64(encoded_ciphertext)
+    JSON.parse(json).symbolize_keys
+  end
+
+  def public_key
+    OpenSSL::PKey::RSA.new Rails.application.credentials.usage_logs_demographics_pk
   end
 end

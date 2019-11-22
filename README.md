@@ -17,6 +17,20 @@ and any usage is then logged.
               +----------+
 ```
 
+## Secrets Management
+
+This project uses Rails' per-environment credentials API. Stored using are:
+* pseudonymisation key secret salts
+* per-environment demographic-logging encrpytion keys
+* database credentials
+
+For testing, the test enviroment credentials file and key file have been committed,
+and can be viewed/updated using:
+
+```
+$ rails credentials:edit --environment test
+```
+
 ## Authentication
 
 Users are authenticated with tokens supplied in the request headers.
@@ -34,7 +48,4 @@ $ rails users:generate_token
 
 ## TODO
 
-* use per-env secrets, as per Rails 6 convention
-* Implement public key encryption of `UsageLog` demographics.
 * Add rake tasks for `PseudonymisationKey` and `KeyGrant` management.
-* support compound key pseudonymisation
