@@ -43,9 +43,13 @@ $ rails users:create
 A token can be (re)generated for a user using:
 
 ```
-$ rails users:generate_token
+$ rails users:generate_token[the_username]
 ```
 
-## TODO
+Users' key grants can be managed using the following tasks:
 
-* Add rake tasks for `PseudonymisationKey` and `KeyGrant` management.
+```
+$ rails users:grants:list[the_username]
+$ rails users:grants:add[the_username]
+$ rails users:grants:revoke[the_username]
+```

@@ -10,6 +10,12 @@ class PseudonymisationKeyTest < ActiveSupport::TestCase
     @compound1 = pseudonymisation_keys(:compound_one)
   end
 
+  test 'the primary scope' do
+    assert PseudonymisationKey.primary.exists?(@primary1.id)
+    refute PseudonymisationKey.primary.exists?(@secondary1.id)
+    assert PseudonymisationKey.primary.exists?(@compound1.id)
+  end
+
   test 'a key should list its secondary keys' do
     assert_includes @primary1.secondary_keys, @secondary1
   end

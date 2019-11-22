@@ -29,6 +29,8 @@ class PseudonymisationKey < ApplicationRecord
   scope :singular, -> { where(key_type: :singular) }
   scope :compound, -> { where(key_type: :compound) }
 
+  scope :primary, -> { where(parent_key_id: nil) }
+
   validates :name, uniqueness: true, presence: true
 
   with_options if: :singular?, absence: true do
