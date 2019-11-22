@@ -21,6 +21,10 @@
 !/storage/.keep
 .byebug_history
 
+# Ignore database config, even though secrets will be elsewhere;
+# we have toolchains that just expect this file to not exist.
+/config/database.yml
+
 # Ignore master key for decrypting credentials and more.
 /config/master.key
 

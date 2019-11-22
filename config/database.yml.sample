@@ -1,3 +1,6 @@
+# As secrets are stored using Rails' Credentials API, this file
+# should be more or less ready to use as-is. 
+
 default: &default
   adapter: postgresql
   encoding: unicode
