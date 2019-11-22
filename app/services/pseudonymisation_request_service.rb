@@ -2,16 +2,13 @@
 class PseudonymisationRequestService
   # Can be raised if invalid params supplied:
   class RequestError < StandardError; end
-  class MissingDemographic < RequestError; end
+  class MissingDemographics < RequestError; end
   class MissingKey < RequestError; end
   class UnknownKeyError < RequestError; end
   class UnknownVariantError < RequestError; end
 
-  # Known variants, with the fields required:
-  VARIANTS = {
-    1 => %i[nhsnumber],
-    2 => %i[birth_date postcode]
-  }.freeze
+  # Known variants:
+  VARIANTS = [1, 2].freeze
 
   attr_reader :user, :params, :errors
 
@@ -60,25 +57,17 @@ class PseudonymisationRequestService
   end
 
   def demographics
-    params[:demographics].presence || raise(MissingKey, :demographics)
+    raise(MissingKey, :demographics) if params[:demographics].blank?
+
+    Demographics.new(params[:demographics])
   end
 
   def variants
-    variants = VARIANTS
-    requested = Array(params[:variants])
+    variants = Array(params[:variants]).map(&:to_i).presence || VARIANTS
+    variants.each { |number| raise(UnknownVariantError) unless number.in?(VARIANTS) }
 
-    if requested.present?
-      variants = requested.map.with_object({}) do |number, hash|
-        variant = number.to_i
-        hash[variant] = variants.fetch(variant) { raise(UnknownVariantError, number) }
-      end
-    end
-
-    variants.each do |_number, required_fields|
-      required_fields.each do |field|
-        demographics.key?(field) || raise(MissingDemographic, field)
-      end
-    end
+    missing = variants.flat_map { |number| demographics.missing_for_variant(number) }
+    raise(MissingDemographics, missing) if missing.any?
 
     variants
   end

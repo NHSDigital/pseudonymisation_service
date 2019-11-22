@@ -31,15 +31,18 @@ class PseudonymisationControllerTest < ActionDispatch::IntegrationTest
     assert_equal 2, response.parsed_body.length
   end
 
-  test 'should not allow specificaition of variant 1 without nhsnumber' do
-    post_with_params variants: ['1'], demographics: { nhsnumber: '' }
-    assert_response :success
+  test 'should not allow specification of variant 1 without nhs number' do
+    post_with_params variants: ['1'], demographics: { nhs_number: '' }
+    assert_response :forbidden
 
     post_with_params variants: ['1'], demographics: { birth_date: '2000-01-01' }
     assert_response :forbidden
   end
 
-  test 'should not allow specificaition of variant 1 without postcode and DoB' do
+  test 'should not allow specification of variant 2 without postcode and DoB' do
+    post_with_params variants: ['2']
+    assert_response :success
+
     post_with_params variants: ['2'], demographics: { birth_date: '2000-01-01', postcode: 'W1A 1AA' }
     assert_response :success
 
@@ -78,7 +81,7 @@ class PseudonymisationControllerTest < ActionDispatch::IntegrationTest
   private
 
   def post_with_params(params = {})
-    demographics = { nhsnumber: '0123456789', postcode: 'W1A 1AA', birth_date: '2000-01-01' }
+    demographics = { nhs_number: '0123456789', postcode: 'W1A 1AA', birth_date: '2000-01-01' }
     default_params = { context: 'testing', demographics: demographics }
     post pseudonymise_url, params: default_params.merge(params)
   end
