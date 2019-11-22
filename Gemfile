@@ -26,6 +26,7 @@ group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
 
   gem 'ndr_dev_support'
+  gem 'prometheus-client', '~> 0.9.0' # signature changes
 end
 
 group :development do
