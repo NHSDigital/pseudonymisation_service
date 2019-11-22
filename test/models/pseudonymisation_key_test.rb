@@ -100,4 +100,11 @@ class PseudonymisationKeyTest < ActiveSupport::TestCase
     assert_raises(KeyError) { @primary1.salts }
     refute @primary1.configured?
   end
+
+  test 'should be able to retrieve a salt by name or number' do
+    assert_equal 'wibble', @primary1.salt(1)
+    assert_equal 'wobble', @primary1.salt(:demog)
+
+    assert_raises(KeyError) { @primary1.salt(:wibble) }
+  end
 end

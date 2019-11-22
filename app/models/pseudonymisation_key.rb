@@ -1,5 +1,5 @@
 # Represents the secret pseudonymisation keys. The actual
-# secrets are not stored in the database.
+# secret salts are not stored in the database.
 #
 # Primary keys take in raw demographics, whereas secondary
 # "repseudonymisation" keys operate on the output of other
@@ -46,6 +46,13 @@ class PseudonymisationKey < ApplicationRecord
     validate :ensure_valid_chain
   end
 
+  SALT_ID_MAP = {
+    id: 1,
+    demog: 2,
+    clinical: 3,
+    rawdata: 4
+  }.freeze
+
   class << self
     # All key salts are stored in environment-specific encrypted credentials
     # files, with each pseudonymisation key having an named entry.
@@ -62,8 +69,18 @@ class PseudonymisationKey < ApplicationRecord
     end
   end
 
+  # Each pseudonymisation key needs salt(s) to operate:
+  #   salt1 is for pseudonymisation
+  #   salt2 is for encrypting demographics
+  #   salt3 (optional) is for encrypting clinical data
+  #   salt4 (optional) is for encrypting rawtext / mixed demographics and clinical data
   def salts
     self.class.salts.fetch(name.to_sym)
+  end
+
+  def salt(id)
+    normalised_id = SALT_ID_MAP.fetch(id, id)
+    salts.fetch(:"salt#{normalised_id}")
   end
 
   def configured?
