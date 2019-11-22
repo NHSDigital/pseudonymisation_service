@@ -4,3 +4,5 @@
 require_relative 'config/application'
 
 Rails.application.load_tasks
+
+require 'ndr_dev_support/tasks' if Rails.env.development? || Rails.env.test?
