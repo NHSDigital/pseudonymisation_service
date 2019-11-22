@@ -93,7 +93,7 @@ class PseudonymisationKeyTest < ActiveSupport::TestCase
   end
 
   test 'should be able to retrieve salts from the secrets file' do
-    assert_equal({ salt1: 'wibble', salt2: 'wobble' }, @primary1.salts)
+    assert_equal %i[salt1 salt2 salt3 salt4], @primary1.salts.keys
     assert @primary1.configured?
 
     @primary1.name = 'not a key name'
@@ -102,8 +102,8 @@ class PseudonymisationKeyTest < ActiveSupport::TestCase
   end
 
   test 'should be able to retrieve a salt by name or number' do
-    assert_equal 'wibble', @primary1.salt(1)
-    assert_equal 'wobble', @primary1.salt(:demog)
+    assert @primary1.salt(1).starts_with? '660b43897f4b4e4c'
+    assert @primary1.salt(:demog).starts_with? '11908217d8e5e189'
 
     assert_raises(KeyError) { @primary1.salt(:wibble) }
   end

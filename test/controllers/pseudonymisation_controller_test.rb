@@ -9,6 +9,20 @@ class PseudonymisationControllerTest < ActionDispatch::IntegrationTest
   test 'should use granted keys and variants to pseudonymise unless specified' do
     post_with_params
     assert_response :success
+
+    actual = response.parsed_body
+    expected = [{ 'key_name' => 'Primary Key One',
+                  'variant' => 1,
+                  'demographics' => { 'nhs_number' => '0123456789', 'postcode' => 'W1A 1AA', 'birth_date' => '2000-01-01' },
+                  'context' => 'testing',
+                  'pseudoid' => 'b549045d4aaf639eaca7e543b4a725cd7bd441d3c59ecaed997786e8bb504a97' },
+                { 'key_name' => 'Primary Key One',
+                  'variant' => 2,
+                  'demographics' => { 'nhs_number' => '0123456789', 'postcode' => 'W1A 1AA', 'birth_date' => '2000-01-01' },
+                  'context' => 'testing',
+                  'pseudoid' => 'd7bc8a726b8110b09765db5b151b999f34b9c269301e82af6ce1d349c847374b' }]
+
+    assert_equal expected, actual
   end
 
   test 'should use specified keys to pseudonymise if granted' do

@@ -44,4 +44,8 @@ class DemographicsTest < ActiveSupport::TestCase
     assert_equal %i[], Demographics.new(fields).missing_for_variant(1)
     assert_equal %i[], Demographics.new(fields).missing_for_variant(2)
   end
+
+  test 'should convert to a hash' do
+    assert_equal({ nhs_number: '0123456789' }, @demographics.to_h)
+  end
 end

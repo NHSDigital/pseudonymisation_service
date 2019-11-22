@@ -75,7 +75,8 @@ class PseudonymisationRequestService
   def results
     keys.flat_map do |key|
       variants.map do |variant|
-        { key: key, variant: variant, context: context }
+        attrs = { key: key, variant: variant, context: context, demographics: demographics }
+        PseudonymisationResult.new(**attrs).to_h
       end
     end
   end

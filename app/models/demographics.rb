@@ -25,6 +25,10 @@ class Demographics
     VARIANT_FIELDS.fetch(variant, []).reject { |field| valid?(field) }
   end
 
+  def to_h
+    @attrs
+  end
+
   private
 
   def matches_any_pattern?(field)
