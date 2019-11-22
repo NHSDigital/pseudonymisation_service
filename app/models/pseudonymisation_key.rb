@@ -29,9 +29,6 @@ class PseudonymisationKey < ApplicationRecord
   scope :singular, -> { where(key_type: :singular) }
   scope :compound, -> { where(key_type: :compound) }
 
-  scope :primary, -> { singular.where(parent_key_id: nil) }
-  scope :secondary, -> { singular.where.not(parent_key_id: nil) }
-
   validates :name, uniqueness: true, presence: true
 
   with_options if: :singular?, absence: true do
@@ -50,7 +47,8 @@ class PseudonymisationKey < ApplicationRecord
     id: 1,
     demog: 2,
     clinical: 3,
-    rawdata: 4
+    rawdata: 4,
+    repseudo: 5
   }.freeze
 
   class << self
@@ -74,13 +72,14 @@ class PseudonymisationKey < ApplicationRecord
   #   salt2 is for encrypting demographics
   #   salt3 (optional) is for encrypting clinical data
   #   salt4 (optional) is for encrypting rawtext / mixed demographics and clinical data
+  #   salt5 is for repseudonymising
   def salts
     self.class.salts.fetch(name.to_sym)
   end
 
   def salt(id)
     normalised_id = SALT_ID_MAP.fetch(id, id)
-    salts.fetch(:"salt#{normalised_id}")
+    salts.fetch(:"salt#{normalised_id}") { raise KeyError, "could not find salt: #{normalised_id}" }
   end
 
   def configured?
@@ -89,11 +88,56 @@ class PseudonymisationKey < ApplicationRecord
     false
   end
 
+  def primary?
+    parent_key.nil?
+  end
+
+  def secondary?
+    !primary?
+  end
+
+  def pseudoid1_for(nhs_number:)
+    raise 'this key can only be used for re-pseudonymisation' unless primary?
+
+    if singular?
+      id1, = pseudonymiser.generate_keys_nhsnumber_demog_only(salt(:id), salt(:demog), nhs_number)
+      id1
+    else
+      id1 = start_key.pseudoid1_for(nhs_number: nhs_number)
+      repseudonymise(id1, chain[1..-1])
+    end
+  end
+
+  def pseudoid2_for(postcode:, birth_date:)
+    raise 'this key can only be used for re-pseudonymisation' unless primary?
+
+    if singular?
+      _id1, id2, = pseudonymiser.generate_keys(salt(:id), salt(:demog), salt(:clinical),
+                                               '0123456789', postcode, birth_date)
+      id2
+    else
+      id2 = start_key.pseudoid2_for(postcode: postcode, birth_date: birth_date)
+      repseudonymise(id2, chain[1..-1])
+    end
+  end
+
   private
+
+  def repseudonymise(pseudoid, keys)
+    keys.each do |key|
+      pseudoid = Digest::SHA2.hexdigest("pseudoid_#{pseudoid}#{key.salt(:repseudo)}")
+    end
+
+    pseudoid
+  end
+
+  def pseudonymiser
+    NdrPseudonymise::SimplePseudonymisation
+  end
 
   def ensure_valid_chain
     return unless start_key && end_key
-    return if start_key.in?(end_key.chain)
+    return if start_key.primary? && start_key.in?(end_key.chain)
 
     errors.add(:start_key, :invalid)
   end

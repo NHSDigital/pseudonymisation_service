@@ -6,17 +6,8 @@ class PseudonymisationKeyTest < ActiveSupport::TestCase
     @primary2 = pseudonymisation_keys(:primary_two)
     @secondary1 = pseudonymisation_keys(:repseudo_one)
     @secondary2 = pseudonymisation_keys(:repseudo_two)
+    @secondary3 = pseudonymisation_keys(:repseudo_three)
     @compound1 = pseudonymisation_keys(:compound_one)
-  end
-
-  test 'should scope primary keys' do
-    assert PseudonymisationKey.primary.exists?(@primary1.id)
-    refute PseudonymisationKey.primary.exists?(@secondary1.id)
-  end
-
-  test 'should scope secondary keys' do
-    refute PseudonymisationKey.secondary.exists?(@primary1.id)
-    assert PseudonymisationKey.secondary.exists?(@secondary1.id)
   end
 
   test 'a key should list its secondary keys' do
@@ -88,6 +79,19 @@ class PseudonymisationKeyTest < ActiveSupport::TestCase
     assert_includes key.errors.details[:start_key], error: :taken, value: @primary1
   end
 
+  test 'compound keys should start with a primary pseudo key' do
+    key = PseudonymisationKey.compound.new(name: 'a compound key')
+    key.end_key = @secondary3
+
+    key.start_key = @primary2
+    key.valid?
+    refute_includes key.errors.details[:start_key], error: :invalid
+
+    key.start_key = @secondary2
+    refute key.valid?
+    assert_includes key.errors.details[:start_key], error: :invalid
+  end
+
   test 'should know which users use has been granted to' do
     assert_equal [users(:test_user)], pseudonymisation_keys(:primary_one).users
   end
@@ -105,6 +109,23 @@ class PseudonymisationKeyTest < ActiveSupport::TestCase
     assert @primary1.salt(1).starts_with? '660b43897f4b4e4c'
     assert @primary1.salt(:demog).starts_with? '11908217d8e5e189'
 
-    assert_raises(KeyError) { @primary1.salt(:wibble) }
+    exception = assert_raises(KeyError) { @primary1.salt(:wibble) }
+    assert_match(/could not find salt: wibble/, exception.message)
+  end
+
+  test 'a singular pseudonymisation key should produce pseudoIDs' do
+    pseudoid1 = @primary1.pseudoid1_for(nhs_number: '0123456789')
+    assert pseudoid1.starts_with?('b549045d4aaf')
+
+    pseudoid2 = @primary1.pseudoid2_for(birth_date: '1990-01-01', postcode: 'CB22 3AD')
+    assert pseudoid2.starts_with?('a630b7aa4919')
+  end
+
+  test 'a compound pseudonymisation key should produce pseudoIDs' do
+    pseudoid1 = @compound1.pseudoid1_for(nhs_number: '0123456789')
+    assert pseudoid1.starts_with?('04149c7ed9f3')
+
+    pseudoid2 = @compound1.pseudoid2_for(birth_date: '1990-01-01', postcode: 'CB22 3AD')
+    assert pseudoid2.starts_with?('5c4973105c6d')
   end
 end

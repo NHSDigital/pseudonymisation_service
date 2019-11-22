@@ -14,6 +14,10 @@ repseudo_two:
   name: RePseudo Key Two
   parent_key: primary_two
 
+repseudo_three:
+  name: RePseudo Key Three
+  parent_key: repseudo_two
+
 compound_one:
   key_type: compound
   name: Compound Key One
