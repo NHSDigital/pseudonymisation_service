@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_14_173059) do
+ActiveRecord::Schema.define(version: 2019_11_22_153735) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -42,9 +42,10 @@ ActiveRecord::Schema.define(version: 2019_11_14_173059) do
   create_table "usage_logs", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "pseudonymisation_key_id", null: false
-    t.string "partial_pseudoid"
-    t.text "encrypted_demographics"
-    t.string "context"
+    t.string "partial_pseudoid", null: false
+    t.text "encrypted_demographics", null: false
+    t.string "context", null: false
+    t.integer "variant", null: false
     t.index ["partial_pseudoid"], name: "index_usage_logs_on_partial_pseudoid"
     t.index ["pseudonymisation_key_id"], name: "index_usage_logs_on_pseudonymisation_key_id"
     t.index ["user_id"], name: "index_usage_logs_on_user_id"

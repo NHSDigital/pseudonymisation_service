@@ -25,6 +25,16 @@ class PseudonymisationControllerTest < ActionDispatch::IntegrationTest
     assert_equal expected, actual
   end
 
+  test 'should create a log for each use of a pseudo key' do
+    assert_difference(-> { UsageLog.count }, 2) { post_with_params }
+  end
+
+  test 'should fail if logging is not successful' do
+    UsageLog.any_instance.stubs(valid?: false)
+    assert_no_difference(-> { UsageLog.count }) { post_with_params }
+    assert_response :internal_server_error
+  end
+
   test 'should use specified keys to pseudonymise if granted' do
     post_with_params key_names: [@key1.name]
     assert_response :success

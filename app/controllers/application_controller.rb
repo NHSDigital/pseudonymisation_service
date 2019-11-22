@@ -4,6 +4,12 @@ class ApplicationController < ActionController::API
 
   before_action :authenticate
 
+  # Any failure to persist is the fault of the server, rather than the client;
+  # from the client's point of view, the server is stateless.
+  rescue_from ActiveRecord::RecordInvalid do
+    render status: :internal_server_error
+  end
+
   def info
     render json: { api_version: '1' }
   end

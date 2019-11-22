@@ -7,9 +7,18 @@ class PseudonymisationController < ApplicationController
     success, output = service.call
 
     if success
-      render json: output
+      render json: log_and_transform(output)
     else
       render status: :forbidden # + output info
+    end
+  end
+
+  private
+
+  def log_and_transform(output)
+    output.map do |result|
+      current_user.usage_logs.create_from_result!(result)
+      result.to_h
     end
   end
 end
