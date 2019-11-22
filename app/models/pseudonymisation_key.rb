@@ -46,12 +46,30 @@ class PseudonymisationKey < ApplicationRecord
     validate :ensure_valid_chain
   end
 
+  class << self
+    # All key salts are stored in environment-specific encrypted credentials
+    # files, with each pseudonymisation key having an named entry.
+    def salts
+      Rails.application.credentials.pseudonymisation_keys
+    end
+  end
+
   def chain
     if singular?
       (parent_key&.chain || []) + [self]
     elsif compound?
       [start_key] + (end_key.chain - start_key.chain)
     end
+  end
+
+  def salts
+    self.class.salts.fetch(name.to_sym)
+  end
+
+  def configured?
+    salts.any?
+  rescue KeyError
+    false
   end
 
   private

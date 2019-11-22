@@ -91,4 +91,13 @@ class PseudonymisationKeyTest < ActiveSupport::TestCase
   test 'should know which users use has been granted to' do
     assert_equal [users(:test_user)], pseudonymisation_keys(:primary_one).users
   end
+
+  test 'should be able to retrieve salts from the secrets file' do
+    assert_equal({ salt1: 'wibble', salt2: 'wobble' }, @primary1.salts)
+    assert @primary1.configured?
+
+    @primary1.name = 'not a key name'
+    assert_raises(KeyError) { @primary1.salts }
+    refute @primary1.configured?
+  end
 end
