@@ -39,8 +39,5 @@ module PseudonymisationService
 
     # Standard path for userlist:
     config.userlist_path = Rails.root.join('config', 'userlist.yml')
-
-    # Don't store any demographics in log output:
-    config.filter_parameters += [:demographics]
   end
 end
