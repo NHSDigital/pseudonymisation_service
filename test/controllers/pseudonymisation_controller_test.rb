@@ -26,7 +26,9 @@ class PseudonymisationControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'should create a log for each use of a pseudo key' do
+    ActionDispatch::Request.any_instance.stubs(remote_ip: '127.0.0.2')
     assert_difference(-> { UsageLog.count }, 2) { post_with_params }
+    assert_equal '127.0.0.2', UsageLog.first.remote_ip
   end
 
   test 'should fail if logging is not successful' do

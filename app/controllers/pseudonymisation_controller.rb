@@ -17,7 +17,7 @@ class PseudonymisationController < ApplicationController
 
   def log_and_transform(output)
     output.map do |result|
-      current_user.usage_logs.create_from_result!(result)
+      current_user.usage_logs.create_from_result!(result, remote_ip: request.remote_ip)
       result.to_h
     end
   end
