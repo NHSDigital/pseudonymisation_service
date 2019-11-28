@@ -22,6 +22,7 @@ class UsageLogTest < ActiveSupport::TestCase
 
     log = user.usage_logs.create_from_result!(result)
     assert log.persisted?
+    assert_in_delta Time.current, log.created_at, 0.1
     assert_equal 1, log.variant
     assert_equal 'foo', log.context
     assert_equal key, log.pseudonymisation_key

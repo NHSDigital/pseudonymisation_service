@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_22_153735) do
+ActiveRecord::Schema.define(version: 2019_11_27_140650) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -46,6 +46,7 @@ ActiveRecord::Schema.define(version: 2019_11_22_153735) do
     t.text "encrypted_demographics", null: false
     t.string "context", null: false
     t.integer "variant", null: false
+    t.datetime "created_at", precision: 6, null: false
     t.index ["partial_pseudoid"], name: "index_usage_logs_on_partial_pseudoid"
     t.index ["pseudonymisation_key_id"], name: "index_usage_logs_on_pseudonymisation_key_id"
     t.index ["user_id"], name: "index_usage_logs_on_user_id"
