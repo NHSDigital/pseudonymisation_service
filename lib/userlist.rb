@@ -33,6 +33,14 @@ module Userlist
   end
 
   def write(list)
+    backup(path)
     File.write(path, list.to_yaml)
+  end
+
+  def backup(path)
+    return unless File.exist?(path)
+
+    backup_path = "#{path}.#{Time.current.strftime('%Y%m%d%H%M%S')}.bk"
+    FileUtils.cp(path, backup_path)
   end
 end
