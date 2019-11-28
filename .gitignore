@@ -25,7 +25,9 @@
 # we have toolchains that just expect this file to not exist.
 /config/database.yml
 
-# Ignore master key for decrypting credentials and more.
+# Ignore master credentials + key. We explicitly keep the .enc file
+# out of version control too, on account of its contents.
+/config/credentials.yml.enc
 /config/master.key
 
 # Ignore production user credential hash file, and any backups:
