@@ -25,7 +25,7 @@ namespace :users do
     puts <<~MESSAGE
       The following token has been generated for #{user.username}:
 
-      #{token}
+      #{user.username}:#{token}
 
       A hashed version has been added to:
 

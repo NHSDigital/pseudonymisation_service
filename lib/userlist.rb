@@ -10,11 +10,10 @@ module Userlist
   end
 
   def find_by(token:)
-    user = nil
-    list.each do |name, hash|
-      user = name if BCrypt::Password.new(hash) == token
-    end
-    user
+    name, token = token.split(':', 2)
+    hash = list.fetch(name) { return nil }
+
+    name if BCrypt::Password.new(hash) == token
   end
 
   def add(name:, token:)
