@@ -25,6 +25,10 @@ class UsageLog < ApplicationRecord
     self.encrypted_demographics = public_encrypt(demographics)
   end
 
+  def readonly?
+    !new_record?
+  end
+
   private
 
   def public_encrypt(data)

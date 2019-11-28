@@ -5,6 +5,13 @@ class UsageLogTest < ActiveSupport::TestCase
     path = Rails.root.join('test', 'keys', 'test_usage_log_private_key.pem')
     passphrase = 'just for testing'
     @private_key = OpenSSL::PKey::RSA.new(File.read(path), passphrase)
+
+    @key = pseudonymisation_keys(:primary_one)
+    @demographics = Demographics.new(nhs_number: '0123456789')
+    result = PseudonymisationResult.new(key: @key, variant: 1, demographics: @demographics, context: 'foo')
+    @user = users(:test_user)
+
+    @log = @user.usage_logs.create_from_result!(result)
   end
 
   test 'should allow demographics to be assigned and decrypted' do
@@ -15,18 +22,25 @@ class UsageLogTest < ActiveSupport::TestCase
   end
 
   test 'should be createable from a pseudonymisation result' do
-    key = pseudonymisation_keys(:primary_one)
-    demographics = Demographics.new(nhs_number: '0123456789')
-    result = PseudonymisationResult.new(key: key, variant: 1, demographics: demographics, context: 'foo')
-    user = users(:test_user)
+    assert @log.persisted?
+    assert_in_delta Time.current, @log.created_at, 0.1
+    assert_equal 1, @log.variant
+    assert_equal 'foo', @log.context
+    assert_equal @user, @log.user
+    assert_equal @key, @log.pseudonymisation_key
+    assert_match(/[[:xdigit:]]{8}/, @log.partial_pseudoid)
+    assert_equal @demographics.to_h, @log.demographics(private_key: @private_key)
+  end
 
-    log = user.usage_logs.create_from_result!(result)
-    assert log.persisted?
-    assert_in_delta Time.current, log.created_at, 0.1
-    assert_equal 1, log.variant
-    assert_equal 'foo', log.context
-    assert_equal key, log.pseudonymisation_key
-    assert_match(/[[:xdigit:]]{8}/, log.partial_pseudoid)
-    assert_equal demographics.to_h, log.demographics(private_key: @private_key)
+  test 'readonly - should not allow updates' do
+    assert_raises(ActiveRecord::ReadOnlyRecord) do
+      refute @log.update_attribute(:partial_pseudoid, 'something-else')
+    end
+    refute_equal 'something-else', @log.reload.partial_pseudoid
+  end
+
+  test 'readonly - should not allow destroy' do
+    assert_raises(ActiveRecord::ReadOnlyRecord) { refute @log.destroy }
+    assert @log.persisted?
   end
 end
