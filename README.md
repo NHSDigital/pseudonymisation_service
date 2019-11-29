@@ -21,10 +21,10 @@ and any usage is then logged.
 
 This project uses Rails' per-environment credentials API. Stored using are:
 * pseudonymisation key secret salts
-* per-environment demographic-logging encrpytion keys
+* per-environment demographic-logging encryption keys
 * database credentials
 
-For testing, the test enviroment credentials file and key file have been committed,
+For testing, the test environment credentials file and key file have been committed,
 and can be viewed/updated using:
 
 ```

@@ -6,11 +6,11 @@ class KeyGrant < ApplicationRecord
 
   validates :user, uniqueness: { scope: :pseudonymisation_key }
 
-  validate :ensure_psuedonymisation_key_is_primary
+  validate :ensure_pseudonymisation_key_is_primary
 
   private
 
-  def ensure_psuedonymisation_key_is_primary
+  def ensure_pseudonymisation_key_is_primary
     return if pseudonymisation_key.primary?
 
     errors.add(:pseudonymisation_key, 'not a primary pseudo key')
