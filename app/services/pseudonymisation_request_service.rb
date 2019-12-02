@@ -73,7 +73,7 @@ class PseudonymisationRequestService
   def demographics
     raise(MissingKey, :demographics) if params[:demographics].blank?
 
-    Demographics.new(params[:demographics])
+    DemographicsCollection.new(params[:demographics])
   end
 
   def requested_variants
@@ -104,8 +104,10 @@ class PseudonymisationRequestService
       variants.map do |variant|
         next unless key.supports_variant?(variant)
 
-        attrs = { key: key, variant: variant, context: context, demographics: demographics }
-        results << PseudonymisationResult.new(**attrs)
+        demographics.each do |set|
+          attrs = { key: key, variant: variant, context: context, demographics: set }
+          results << PseudonymisationResult.new(**attrs)
+        end
       end
     end
   end

@@ -53,6 +53,44 @@ class PseudonymisationControllerTest < ActionDispatch::IntegrationTest
     assert_equal expected, actual, 'should have used "RePseudo Key One" and variant 3'
   end
 
+  test 'should return results for each demographic set received for bulk processing' do
+    post_with_params demographics: [{ nhs_number: '0123456789' }, { nhs_number: '1111111111' }]
+    assert_response :success
+
+    actual = response.parsed_body
+    expected = [{ 'key_name' => 'Primary Key One',
+                  'variant' => 1,
+                  'demographics' => { 'nhs_number' => '0123456789' },
+                  'context' => 'testing',
+                  'pseudoid' => 'b549045d4aaf639eaca7e543b4a725cd7bd441d3c59ecaed997786e8bb504a97' },
+                { 'key_name' => 'Primary Key One',
+                  'variant' => 1,
+                  'demographics' => { 'nhs_number' => '1111111111' },
+                  'context' => 'testing',
+                  'pseudoid' => '08f78e23b4783144726369a03289836cebff6a7e4d1b9d4d00f65e823ecf602a' }]
+
+    assert_equal expected, actual, 'should have used "Primary Key One" and variant 1'
+  end
+
+  test 'a input issue when bulk processing should log nothing, and return no results' do
+    assert_no_difference(-> { UsageLog.count }) do
+      post_with_params demographics: [{ nhs_number: '0123456789' }, { nhs_number: 'wibble' }]
+    end
+
+    assert_response :forbidden
+  end
+
+  test 'a crash when bulk processing should log nothing, and return no results' do
+    assert_no_difference(-> { UsageLog.count }) do
+      pseudoid = SecureRandom.hex(32)
+      PseudonymisationResult.any_instance.stubs(:pseudoid).returns(pseudoid).then.raises(StandardError)
+      post_with_params demographics: [{ nhs_number: '0123456789' }, { nhs_number: '1111111111' }]
+    end
+
+    assert_response :internal_server_error
+    assert response.body.blank?
+  end
+
   test 'should create a log for each use of a pseudo key' do
     ActionDispatch::Request.any_instance.stubs(remote_ip: '127.0.0.2')
     assert_difference(-> { UsageLog.count }, 2) { post_with_params }

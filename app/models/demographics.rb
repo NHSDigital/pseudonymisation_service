@@ -31,6 +31,14 @@ class Demographics
     @attrs
   end
 
+  def ==(other)
+    self.class == other.class && attrs == other.attrs
+  end
+
+  protected
+
+  attr_reader :attrs
+
   private
 
   def matches_any_pattern?(field)
