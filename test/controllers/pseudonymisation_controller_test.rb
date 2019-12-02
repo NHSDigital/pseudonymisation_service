@@ -73,11 +73,17 @@ class PseudonymisationControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'a input issue when bulk processing should log nothing, and return no results' do
-    assert_no_difference(-> { UsageLog.count }) do
-      post_with_params demographics: [{ nhs_number: '0123456789' }, { nhs_number: 'wibble' }]
-    end
+    demographics = [{ nhs_number: '0123456789' }, { nhs_number: 'wibble' }]
 
-    assert_response :forbidden
+    assert_no_difference(-> { UsageLog.count }) do
+      post_with_params demographics: demographics
+    end
+    assert_forbidden 'no variants could be determined automatically, please specify explicitly'
+
+    assert_no_difference(-> { UsageLog.count }) do
+      post_with_params demographics: demographics, variants: ['1']
+    end
+    assert_forbidden 'missing/invalid demographics: nhs_number'
   end
 
   test 'a crash when bulk processing should log nothing, and return no results' do
@@ -125,10 +131,10 @@ class PseudonymisationControllerTest < ActionDispatch::IntegrationTest
 
   test 'should not allow specification of variant 1 without nhs number' do
     post_with_params variants: ['1'], demographics: { nhs_number: '' }
-    assert_response :forbidden
+    assert_forbidden 'missing/invalid demographics: nhs_number'
 
     post_with_params variants: ['1'], demographics: { birth_date: '2000-01-01' }
-    assert_response :forbidden
+    assert_forbidden 'missing/invalid demographics: nhs_number'
   end
 
   test 'should not allow specification of variant 2 without postcode and DoB' do
@@ -139,48 +145,48 @@ class PseudonymisationControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
 
     post_with_params variants: ['2'], demographics: { birth_date: '2000-01-01' }
-    assert_response :forbidden
+    assert_forbidden 'missing/invalid demographics: postcode'
 
     post_with_params variants: ['2'], demographics: { postcode: 'W1A 1AA' }
-    assert_response :forbidden
+    assert_forbidden 'missing/invalid demographics: birth_date'
   end
 
   test 'should not allow specification of variant 3 without pseudoid' do
     post_with_params variants: ['3'], demographics: { input_pseudoid: SecureRandom.hex(32) }, key_names: [@rekey1.name]
     assert_response :success
 
-    post_with_params variants: ['3'], demographics: {}, key_names: [@rekey1.name]
-    assert_response :forbidden
+    post_with_params variants: ['3'], demographics: { nhs_number: '1111111111' }, key_names: [@rekey1.name]
+    assert_forbidden 'missing/invalid demographics: input_pseudoid'
   end
 
   test 'should not allow invalid variant / key combinations to be requested' do
-    post_with_params variants: ['1'], key_names: [@rekey1.name]
-    assert_response :forbidden
+    post_with_params variants: %w[1 2], key_names: [@rekey1.name]
+    assert_forbidden 'variant 1 and 2 not appropriate for a requested pseudonymisation key'
   end
 
   test 'should not allow non-existent variants to be specified' do
     post_with_params variants: %w[1 wibble]
-    assert_response :forbidden
+    assert_forbidden 'unavailable variant requested'
   end
 
   test 'should not allow requests without demographics' do
     post_with_params demographics: {}
-    assert_response :forbidden
+    assert_forbidden "no value for 'demographics' was supplied"
   end
 
   test 'should not allow requests without context' do
     post_with_params context: ''
-    assert_response :forbidden
+    assert_forbidden "no value for 'context' was supplied"
   end
 
   test 'should not allow ungranted keys to be specified' do
     post_with_params key_names: [@key2.name]
-    assert_response :forbidden
+    assert_forbidden "key 'Primary Key Two' is not available for use"
   end
 
   test 'should not allow non-existent keys to be specified' do
     post_with_params key_names: ['wibble']
-    assert_response :forbidden
+    assert_forbidden "key 'wibble' is not available for use"
   end
 
   private
@@ -189,5 +195,10 @@ class PseudonymisationControllerTest < ActionDispatch::IntegrationTest
     demographics = { nhs_number: '0123456789', postcode: 'W1A 1AA', birth_date: '2000-01-01' }
     default_params = { context: 'testing', demographics: demographics }
     post pseudonymise_url, params: default_params.merge(params)
+  end
+
+  def assert_forbidden(error)
+    assert_response :forbidden
+    assert_includes response.parsed_body['errors'], error
   end
 end

@@ -7,12 +7,53 @@ class PseudonymisationRequestService
   # Can be raised if invalid params supplied:
   class RequestError < StandardError; end
 
-  class InvalidVariant < RequestError; end
-  class MissingDemographics < RequestError; end
-  class MissingKey < RequestError; end
-  class NoVariants < RequestError; end
-  class UnknownKeyError < RequestError; end
-  class UnknownVariantError < RequestError; end
+  # Raised when requested variant(s) are not compatible with one or
+  # more requested pseudonymisation keys.
+  class InvalidVariant < RequestError
+    def initialize(variants)
+      super "variant #{variants.to_sentence} not appropriate for a requested pseudonymisation key"
+    end
+  end
+
+  # Raised when demographics required by a requested variant are missing,
+  # or invalid:
+  class MissingDemographics < RequestError
+    def initialize(fields)
+      super "missing/invalid demographics: #{fields.to_sentence}"
+    end
+  end
+
+  # Raised when a top-level parameter is missing:
+  class MissingKey < RequestError
+    def initialize(key)
+      super "no value for '#{key}' was supplied"
+    end
+  end
+
+  # Raised when the requested keys and supplied demographics do
+  # not leave any plausible variants to compute. Explicitly requesting
+  # variant(s) would provide more revealing details (e.g. invalid
+  # demographics information).
+  class NoVariants < RequestError
+    def initialize(message = nil)
+      super(message || 'no variants could be determined automatically, please specify explicitly')
+    end
+  end
+
+  # Raised when a pseudonymisation key either does not exist, or
+  # use of a key has not been granted to the user.
+  class UnknownKeyError < RequestError
+    def initialize(key_name)
+      super "key '#{key_name}' is not available for use"
+    end
+  end
+
+  # Raised when the user requests variant(s) that do not exist.
+  class UnknownVariantError < RequestError
+    def initialize(message = nil)
+      super(message || 'unavailable variant requested')
+    end
+  end
 
   # Known variants:
   VARIANTS = [1, 2, 3].freeze

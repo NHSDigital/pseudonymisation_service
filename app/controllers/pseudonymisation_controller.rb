@@ -8,7 +8,7 @@ class PseudonymisationController < ApplicationController
     if success
       render json: log_and_transform(output)
     else
-      render status: :forbidden # + output info
+      render json: { errors: output }, status: :forbidden
     end
   end
 
