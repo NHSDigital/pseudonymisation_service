@@ -26,7 +26,7 @@ gem 'ndr_pseudonymise'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
-  gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
+  gem 'byebug', platforms: %i[mri mingw x64_mingw]
 
   gem 'ndr_dev_support'
   gem 'prometheus-client', '~> 0.9.0' # signature changes

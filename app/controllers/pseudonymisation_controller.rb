@@ -1,6 +1,5 @@
 # Controller to handle the actual pseudonymisation operation.
 class PseudonymisationController < ApplicationController
-
   # POST /api/v1/pseudonymise
   def pseudonymise
     service = PseudonymisationRequestService.new(current_user, params)

@@ -8,6 +8,6 @@ class CreateKeyGrants < ActiveRecord::Migration[6.0]
     end
 
     # Add compound unique constraint:
-    add_index :key_grants, [:user_id, :pseudonymisation_key_id], unique: true
+    add_index :key_grants, %i[user_id pseudonymisation_key_id], unique: true
   end
 end
