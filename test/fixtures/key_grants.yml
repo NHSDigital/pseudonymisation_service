@@ -1,3 +1,7 @@
 grant_one:
   user: test_user
   pseudonymisation_key: primary_one
+
+grant_two:
+  user: test_user
+  pseudonymisation_key: repseudo_one

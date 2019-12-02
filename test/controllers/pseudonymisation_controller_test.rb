@@ -4,9 +4,10 @@ class PseudonymisationControllerTest < ActionDispatch::IntegrationTest
   setup do
     @key1 = pseudonymisation_keys(:primary_one)
     @key2 = pseudonymisation_keys(:primary_two)
+    @rekey1 = pseudonymisation_keys(:repseudo_one)
   end
 
-  test 'should use granted keys and variants to pseudonymise unless specified' do
+  test 'should use granted keys and variants to pseudonymise when given just NHS / DoB / postcode' do
     post_with_params
     assert_response :success
 
@@ -22,7 +23,34 @@ class PseudonymisationControllerTest < ActionDispatch::IntegrationTest
                   'context' => 'testing',
                   'pseudoid' => 'd7bc8a726b8110b09765db5b151b999f34b9c269301e82af6ce1d349c847374b' }]
 
-    assert_equal expected, actual
+    assert_equal expected, actual, 'should have used "Primary Key One" and variants 1 & 2'
+  end
+
+  test 'should use granted keys and variants to pseudonymise when given just NHS' do
+    post_with_params demographics: { nhs_number: '0123456789' }
+    assert_response :success
+
+    actual = response.parsed_body
+    expected = [{ 'key_name' => 'Primary Key One',
+                  'variant' => 1,
+                  'demographics' => { 'nhs_number' => '0123456789' },
+                  'context' => 'testing',
+                  'pseudoid' => 'b549045d4aaf639eaca7e543b4a725cd7bd441d3c59ecaed997786e8bb504a97' }]
+
+    assert_equal expected, actual, 'should have used "Primary Key One" and variant 1'
+  end
+
+  test 'should use granted keys and variants to pseudonymise when given just an existing pseudoid' do
+    input_pseudoid = 'd7bc8a726b8110b09765db5b151b999f34b9c269301e82af6ce1d349c847374b'
+    post_with_params demographics: { input_pseudoid: input_pseudoid }
+    actual = response.parsed_body
+    expected = [{ 'key_name' => 'RePseudo Key One',
+                  'variant' => 3,
+                  'demographics' => { 'input_pseudoid' => input_pseudoid },
+                  'context' => 'testing',
+                  'pseudoid' => 'ad6f477c55ea38092d1c4f94d242c50bd130fee3e41869ee1d367b83e9cae19f' }]
+
+    assert_equal expected, actual, 'should have used "RePseudo Key One" and variant 3'
   end
 
   test 'should create a log for each use of a pseudo key' do
@@ -76,6 +104,19 @@ class PseudonymisationControllerTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
 
     post_with_params variants: ['2'], demographics: { postcode: 'W1A 1AA' }
+    assert_response :forbidden
+  end
+
+  test 'should not allow specification of variant 3 without pseudoid' do
+    post_with_params variants: ['3'], demographics: { input_pseudoid: SecureRandom.hex(32) }, key_names: [@rekey1.name]
+    assert_response :success
+
+    post_with_params variants: ['3'], demographics: {}, key_names: [@rekey1.name]
+    assert_response :forbidden
+  end
+
+  test 'should not allow invalid variant / key combinations to be requested' do
+    post_with_params variants: ['1'], key_names: [@rekey1.name]
     assert_response :forbidden
   end
 

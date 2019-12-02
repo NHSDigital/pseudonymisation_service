@@ -14,7 +14,8 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test 'should know which keys use have been granted of' do
-    assert_equal [pseudonymisation_keys(:primary_one)], users(:test_user).pseudonymisation_keys
+    assert_includes users(:test_user).pseudonymisation_keys, pseudonymisation_keys(:primary_one)
+    refute_includes users(:test_user).pseudonymisation_keys, pseudonymisation_keys(:primary_two)
   end
 
   test 'should expose their ability' do

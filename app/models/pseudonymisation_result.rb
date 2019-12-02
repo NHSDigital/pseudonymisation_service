@@ -3,7 +3,7 @@
 class PseudonymisationResult
   attr_reader :key, :variant, :demographics, :context
 
-  delegate :nhs_number, :birth_date, :postcode, to: :demographics
+  delegate :nhs_number, :birth_date, :postcode, :input_pseudoid, to: :demographics
 
   def initialize(key:, variant:, demographics:, context:)
     @key = key
@@ -32,6 +32,7 @@ class PseudonymisationResult
     case variant
     when 1 then key.pseudoid1_for(nhs_number: nhs_number)
     when 2 then key.pseudoid2_for(postcode: postcode, birth_date: birth_date)
+    when 3 then key.pseudoid3_for(input_pseudoid: input_pseudoid)
     else raise NotImplementedError
     end
   end

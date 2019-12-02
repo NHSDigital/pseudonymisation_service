@@ -22,7 +22,7 @@ class PseudonymisationResultTest < ActiveSupport::TestCase
   test 'should error when requested key is not configured' do
     @key.stubs(salts: {})
     result = PseudonymisationResult.new(key: @key, variant: 1, demographics: @demographics, context: 'foo')
-    assert_raises(KeyError) { result.pseudoid }
+    assert_raises(PseudonymisationKey::MissingSalt) { result.pseudoid }
   end
 
   test 'should produce hash results' do
