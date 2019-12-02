@@ -4,13 +4,15 @@ class Demographics
   PATTERNS = {
     nhs_number: /\A[0-9]{10}\z/,
     postcode: /\A[A-Z0-9 ]+\z/,
-    birth_date: /\A\d{4}-[01]\d-[0-3]\d\z/
+    birth_date: /\A\d{4}-[01]\d-[0-3]\d\z/,
+    input_pseudoid: /\A[a-z0-9]{64}\z/
   }.freeze
 
   # Which pseudoid variants require which fields?
   VARIANT_FIELDS = {
     1 => %i[nhs_number],
-    2 => %i[birth_date postcode]
+    2 => %i[birth_date postcode],
+    3 => %i[input_pseudoid]
   }.freeze
 
   def initialize(attrs)

@@ -31,6 +31,12 @@ class DemographicsTest < ActiveSupport::TestCase
     refute Demographics.new(postcode: '').valid?(:postcode)
   end
 
+  test 'should validate input_pseudoid' do
+    assert Demographics.new(input_pseudoid: SecureRandom.hex(32)).valid?(:input_pseudoid)
+    refute Demographics.new(input_pseudoid: 'not-a-pseudoid').valid?(:input_pseudoid)
+    refute Demographics.new(input_pseudoid: '').valid?(:input_pseudoid)
+  end
+
   test 'should not validate unknown fields' do
     refute Demographics.new(wibble: 'wobble').valid?(:wibble)
   end
@@ -39,6 +45,7 @@ class DemographicsTest < ActiveSupport::TestCase
     fields = { nhs_number: '0123456789' }
     assert_equal %i[], Demographics.new(fields).missing_for_variant(1)
     assert_equal %i[birth_date postcode], Demographics.new(fields).missing_for_variant(2)
+    assert_equal %i[input_pseudoid], Demographics.new(fields).missing_for_variant(3)
 
     fields.merge!(birth_date: '1990-01-01', postcode: 'CB22 3AD')
     assert_equal %i[], Demographics.new(fields).missing_for_variant(1)
