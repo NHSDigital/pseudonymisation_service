@@ -7,6 +7,8 @@
 #
 # Compound keys represent a chain of two or more keys composed.
 class PseudonymisationKey < ApplicationRecord
+  class MissingSalt < StandardError; end
+
   enum key_type: %i[singular compound]
 
   with_options class_name: 'PseudonymisationKey' do
@@ -53,6 +55,13 @@ class PseudonymisationKey < ApplicationRecord
     repseudo: 5
   }.freeze
 
+  # What secrets are needed for each variant?
+  VARIANT_SALT_MAP = {
+    1 => %i[id demog],
+    2 => %i[id demog clinical],
+    3 => %i[repseudo]
+  }.freeze
+
   class << self
     # All key salts are stored in environment-specific encrypted credentials
     # files, with each pseudonymisation key having an named entry.
@@ -76,17 +85,17 @@ class PseudonymisationKey < ApplicationRecord
   #   salt4 (optional) is for encrypting rawtext / mixed demographics and clinical data
   #   salt5 is for repseudonymising
   def salts
-    self.class.salts.fetch(name.to_sym)
+    self.class.salts.fetch(name.to_sym) { raise MissingSalt }
   end
 
   def salt(id)
     normalised_id = SALT_ID_MAP.fetch(id, id)
-    salts.fetch(:"salt#{normalised_id}") { raise KeyError, "could not find salt: #{normalised_id}" }
+    salts.fetch(:"salt#{normalised_id}") { raise MissingSalt, "missing: #{normalised_id}" }
   end
 
   def configured?
     salts.any?
-  rescue KeyError
+  rescue MissingSalt
     false
   end
 
@@ -96,6 +105,19 @@ class PseudonymisationKey < ApplicationRecord
 
   def secondary?
     !primary?
+  end
+
+  def supported_variants
+    VARIANT_SALT_MAP.keys.select { |variant| supports_variant?(variant) }
+  end
+
+  def supports_variant?(variant)
+    return start_key.supports_variant?(variant) if compound?
+
+    ids = VARIANT_SALT_MAP.fetch(variant) { return false }
+    ids.all? { |id| salt(id) }
+  rescue MissingSalt
+    false
   end
 
   def pseudoid1_for(nhs_number:)
@@ -123,6 +145,11 @@ class PseudonymisationKey < ApplicationRecord
     end
   end
 
+  def pseudoid3_for(input_pseudoid:)
+    keys = singular? ? [self] : chain
+    repseudonymise(input_pseudoid, keys)
+  end
+
   private
 
   def repseudonymise(pseudoid, keys)
@@ -139,7 +166,7 @@ class PseudonymisationKey < ApplicationRecord
 
   def ensure_valid_chain
     return unless start_key && end_key
-    return if start_key.primary? && start_key.in?(end_key.chain)
+    return if start_key.in?(end_key.chain)
 
     errors.add(:start_key, :invalid)
   end

@@ -85,19 +85,6 @@ class PseudonymisationKeyTest < ActiveSupport::TestCase
     assert_includes key.errors.details[:start_key], error: :taken, value: @primary1
   end
 
-  test 'compound keys should start with a primary pseudo key' do
-    key = PseudonymisationKey.compound.new(name: 'a compound key')
-    key.end_key = @secondary3
-
-    key.start_key = @primary2
-    key.valid?
-    refute_includes key.errors.details[:start_key], error: :invalid
-
-    key.start_key = @secondary2
-    refute key.valid?
-    assert_includes key.errors.details[:start_key], error: :invalid
-  end
-
   test 'should know which users use has been granted to' do
     assert_equal [users(:test_user)], pseudonymisation_keys(:primary_one).users
   end
@@ -107,7 +94,7 @@ class PseudonymisationKeyTest < ActiveSupport::TestCase
     assert @primary1.configured?
 
     @primary1.name = 'not a key name'
-    assert_raises(KeyError) { @primary1.salts }
+    assert_raises(PseudonymisationKey::MissingSalt) { @primary1.salts }
     refute @primary1.configured?
   end
 
@@ -115,8 +102,8 @@ class PseudonymisationKeyTest < ActiveSupport::TestCase
     assert @primary1.salt(1).starts_with? '660b43897f4b4e4c'
     assert @primary1.salt(:demog).starts_with? '11908217d8e5e189'
 
-    exception = assert_raises(KeyError) { @primary1.salt(:wibble) }
-    assert_match(/could not find salt: wibble/, exception.message)
+    exception = assert_raises(PseudonymisationKey::MissingSalt) { @primary1.salt(:wibble) }
+    assert_match(/missing: wibble/, exception.message)
   end
 
   test 'a singular pseudonymisation key should produce pseudoIDs' do
@@ -133,5 +120,30 @@ class PseudonymisationKeyTest < ActiveSupport::TestCase
 
     pseudoid2 = @compound1.pseudoid2_for(birth_date: '1990-01-01', postcode: 'CB22 3AD')
     assert pseudoid2.starts_with?('5c4973105c6d')
+  end
+
+  test 'a respeudonymication key should accept pseudoIDs' do
+    pseudoid = 'b549045d4aaf639eaca7e543b4a725cd7bd441d3c59ecaed997786e8bb504a97'
+    repseudoid = @secondary1.pseudoid3_for(input_pseudoid: pseudoid)
+
+    # Should be the same as passing straight through the compound key:
+    assert repseudoid.starts_with?('04149c7ed9f3')
+    assert_equal @compound1.pseudoid1_for(nhs_number: '0123456789'), repseudoid
+  end
+
+  test 'should list supported variants' do
+    assert_equal [1, 2], @primary1.supported_variants
+    assert_equal [1, 2], @compound1.supported_variants
+    assert_equal [3], @secondary1.supported_variants
+  end
+
+  test 'should respond when a variant is supported' do
+    assert @primary1.supports_variant?(1)
+    assert @primary1.supports_variant?(2)
+    refute @primary1.supports_variant?(3)
+
+    assert @compound1.supports_variant?(1)
+    assert @compound1.supports_variant?(2)
+    refute @compound1.supports_variant?(3)
   end
 end
