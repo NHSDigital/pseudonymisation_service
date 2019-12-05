@@ -211,6 +211,11 @@ class PseudonymisationControllerTest < ActionDispatch::IntegrationTest
     assert_forbidden 'missing/invalid demographics: input_pseudoid'
   end
 
+  test 'should error when unkown top-level params are supplied' do
+    post_with_params variant: 1
+    assert_forbidden 'unknown parameter(s): ["variant"]'
+  end
+
   private
 
   def post_with_params(params = {})

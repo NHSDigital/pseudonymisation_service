@@ -48,6 +48,13 @@ class PseudonymisationRequestService
     end
   end
 
+  # Raised when the user's request includes unsupported parameters.
+  class UnknownParameterError < RequestError
+    def initialize(parameters)
+      super("unknown parameter(s): #{parameters.inspect}")
+    end
+  end
+
   # Raised when the user requests variant(s) that do not exist.
   class UnknownVariantError < RequestError
     def initialize(message = nil)
@@ -57,6 +64,9 @@ class PseudonymisationRequestService
 
   # Known variants:
   VARIANTS = [1, 2, 3].freeze
+
+  # Supported parameters
+  KNOWN_PARAMETERS = %w[context demographics key_names variants].freeze
 
   attr_reader :user, :params, :errors
 
@@ -77,6 +87,7 @@ class PseudonymisationRequestService
   def validate_params(raise_on_error = false)
     list = []
     begin
+      check_param_keys!
       context # check context
       demographics # checks demographics
       keys # check keys
@@ -87,6 +98,11 @@ class PseudonymisationRequestService
       list << e
     end
     list
+  end
+
+  def check_param_keys!
+    unknown_keys = params.keys - KNOWN_PARAMETERS
+    raise(UnknownParameterError, unknown_keys) if unknown_keys.any?
   end
 
   def requested_key_names
