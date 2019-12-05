@@ -90,54 +90,64 @@ class PseudonymisationRequestService
   end
 
   def requested_key_names
-    Array(params[:key_names])
+    @requested_key_names ||= Array(params[:key_names])
   end
 
   def requested_keys
-    keys.select { |key| key.name.in?(requested_key_names) }
+    @requested_keys ||= keys.select { |key| key.name.in?(requested_key_names) }
   end
 
   def keys
-    keys = PseudonymisationKey.accessible_by(user.ability)
-    return keys if requested_key_names.blank?
+    @keys ||= begin
+      keys = PseudonymisationKey.accessible_by(user.ability)
+      return keys if requested_key_names.blank?
 
-    # If a list has been specified, filter and check them:
-    requested_key_names.map do |name|
-      keys.detect { |key| key.name == name } || raise(UnknownKeyError, name)
+      # If a list has been specified, filter and check them:
+      requested_key_names.map do |name|
+        keys.detect { |key| key.name == name } || raise(UnknownKeyError, name)
+      end
     end
   end
 
   def context
-    params[:context].presence || raise(MissingKey, :context)
+    @context ||= params[:context].presence || raise(MissingKey, :context)
   end
 
   def demographics
-    raise(MissingKey, :demographics) if params[:demographics].blank?
+    @demographics ||= begin
+      raise(MissingKey, :demographics) if params[:demographics].blank?
 
-    DemographicsCollection.new(params[:demographics])
+      DemographicsCollection.new(params[:demographics])
+    end
   end
 
   def requested_variants
-    Array(params[:variants]).map(&:to_i)
+    @requested_variants ||= Array(params[:variants]).map(&:to_i)
   end
 
   def variants
-    variants = requested_variants.presence || VARIANTS.dup
-    variants.each { |number| raise(UnknownVariantError) unless number.in?(VARIANTS) }
+    @variants ||= begin
+      variants = requested_variants.presence || VARIANTS.dup
+      variants.each { |number| raise(UnknownVariantError) unless number.in?(VARIANTS) }
 
-    missing = requested_variants.flat_map { |number| demographics.missing_for_variant(number) }
-    raise(MissingDemographics, missing) if missing.any?
+      missing = requested_variants.flat_map { |number| demographics.missing_for_variant(number) }
+      raise(MissingDemographics, missing) if missing.any?
 
-    explicitly_invalid = requested_variants.select do |variant|
-      requested_keys.any? && requested_keys.none? { |key| key.supports_variant?(variant) }
+      explicitly_invalid = requested_variants.select do |variant|
+        requested_keys.any? && requested_keys.none? { |key| key.supports_variant?(variant) }
+      end
+      raise(InvalidVariant, explicitly_invalid) if explicitly_invalid.any?
+
+      # Remove any default choices that aren't compatible with supplied demographics:
+      variants.reject! { |number| demographics.missing_for_variant(number).any? }
+      raise(NoVariants) if variants.none?
+
+      unless keys.any? { |key| variants.any? { |variant| key.supports_variant?(variant) } }
+        raise(NoVariants, 'no valid demographic/key/variant combination could be found!')
+      end
+
+      variants
     end
-    raise(InvalidVariant, explicitly_invalid) if explicitly_invalid.any?
-
-    # Remove any default choices that aren't compatible with supplied demographics:
-    variants.reject! { |number| demographics.missing_for_variant(number).any? }
-    raise(NoVariants) if variants.none?
-
-    variants
   end
 
   def results

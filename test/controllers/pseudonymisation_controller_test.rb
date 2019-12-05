@@ -72,7 +72,7 @@ class PseudonymisationControllerTest < ActionDispatch::IntegrationTest
     assert_equal expected, actual, 'should have used "Primary Key One" and variant 1'
   end
 
-  test 'a input issue when bulk processing should log nothing, and return no results' do
+  test 'an input issue when bulk processing should log nothing, and return no results' do
     demographics = [{ nhs_number: '0123456789' }, { nhs_number: 'wibble' }]
 
     assert_no_difference(-> { UsageLog.count }) do
@@ -187,6 +187,28 @@ class PseudonymisationControllerTest < ActionDispatch::IntegrationTest
   test 'should not allow non-existent keys to be specified' do
     post_with_params key_names: ['wibble']
     assert_forbidden "key 'wibble' is not available for use"
+  end
+
+  test 'when given junk demographics without a variant, should say so' do
+    post_with_params demographics: { wibble: 'yes' }
+    assert_forbidden 'no variants could be determined automatically, please specify explicitly'
+
+    post_with_params demographics: { wibble: 'yes' }, key_names: [@key1.name]
+    assert_forbidden 'no variants could be determined automatically, please specify explicitly'
+
+    post_with_params demographics: { wibble: 'yes' }, variants: [1]
+    assert_forbidden 'missing/invalid demographics: nhs_number'
+  end
+
+  test 'when supplying mismatched demographics/keys/variants, should not just return empty result set' do
+    post_with_params demographics: { nhs_number: '0123456789' }, key_names: [@rekey1.name]
+    assert_forbidden 'no valid demographic/key/variant combination could be found!'
+
+    post_with_params demographics: { nhs_number: '0123456789' }, key_names: [@rekey1.name], variants: [1]
+    assert_forbidden 'variant 1 not appropriate for a requested pseudonymisation key'
+
+    post_with_params demographics: { nhs_number: '0123456789' }, variants: [3]
+    assert_forbidden 'missing/invalid demographics: input_pseudoid'
   end
 
   private
