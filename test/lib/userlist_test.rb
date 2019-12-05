@@ -45,12 +45,17 @@ class UserlistTest < ActiveSupport::TestCase
     # comparisons for both checks:
     BCrypt::Password.any_instance.expects(:==).with(@token).twice.returns(true)
 
-    assert Userlist.find_by(token: "test_user:#{@token}")
-    FileUtils.touch Userlist.path
-    assert Userlist.find_by(token: "test_user:#{@token}")
-    assert_equal 1, Userlist.token_cache.length
+    travel_to(4.seconds.ago) do
+      Userlist.list(force_read: true) # avoid leakage
+      assert Userlist.find_by(token: "test_user:#{@token}")
+    end
+    FileUtils.touch Userlist.path, mtime: 3.seconds.ago.to_time
+    travel_to(2.seconds.ago) do
+      assert Userlist.find_by(token: "test_user:#{@token}")
+      assert_equal 1, Userlist.token_cache.length
+    end
 
-    FileUtils.touch Userlist.path
+    FileUtils.touch Userlist.path, mtime: 1.second.ago.to_time
     assert_equal 0, Userlist.token_cache.length
   end
 end

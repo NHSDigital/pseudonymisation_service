@@ -9,8 +9,8 @@
 module Userlist
   extend self
 
-  def list
-    if stale?
+  def list(force_read: stale?)
+    if force_read
       token_cache(clear: false)
       @list = nil
     end
