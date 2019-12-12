@@ -27,6 +27,9 @@ gem 'ndr_pseudonymise', '~> 0.3.0'
 # Faster logging for bulk requests:
 gem 'activerecord-import'
 
+# Send stats to prometheus:
+gem 'ndr_stats'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: %i[mri mingw x64_mingw]

@@ -176,6 +176,15 @@ class PseudonymisationRequestService
           results << PseudonymisationResult.new(**attrs)
         end
       end
+    end.tap { |results| instrument(results) }
+  end
+
+  def instrument(results)
+    NdrStats.count(:requests)
+    NdrStats.count(:demographics, demographics.count)
+
+    results.group_by { |r| [r.key, r.variant] }.each do |(key, variant), chunk|
+      NdrStats.count(:results, chunk.length, key_name: key.name, variant: variant)
     end
   end
 end
