@@ -6,15 +6,19 @@ class UsageLog < ApplicationRecord
   belongs_to :pseudonymisation_key
 
   class << self
-    def create_from_result!(result, remote_ip:)
-      create!(
-        demographics: result.demographics.to_h,
-        pseudonymisation_key: result.key,
-        partial_pseudoid: result.pseudoid.slice(0...8),
-        variant: result.variant,
-        context: result.context,
-        remote_ip: remote_ip
-      )
+    def create_from_results!(results, remote_ip:)
+      rows = results.map do |result|
+        new(
+          demographics: result.demographics.to_h,
+          pseudonymisation_key: result.key,
+          partial_pseudoid: result.pseudoid.slice(0...8),
+          variant: result.variant,
+          context: result.context,
+          remote_ip: remote_ip
+        )
+      end
+
+      import!(rows)
     end
   end
 

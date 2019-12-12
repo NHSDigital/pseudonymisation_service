@@ -45,6 +45,8 @@ GEM
     activerecord (6.0.1)
       activemodel (= 6.0.1)
       activesupport (= 6.0.1)
+    activerecord-import (1.0.2)
+      activerecord (>= 3.2)
     activestorage (6.0.1)
       actionpack (= 6.0.1)
       activejob (= 6.0.1)
@@ -268,6 +270,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activerecord-import
   bcrypt (~> 3.1.7)
   bootsnap (>= 1.4.2)
   byebug
@@ -288,4 +291,4 @@ RUBY VERSION
    ruby 2.6.3p62
 
 BUNDLED WITH
-   2.0.1
+   2.0.2

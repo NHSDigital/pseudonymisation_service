@@ -104,7 +104,7 @@ class PseudonymisationControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'should fail if logging is not successful' do
-    UsageLog.any_instance.stubs(valid?: false)
+    UsageLog.any_instance.stubs(user_id: nil)
     assert_no_difference(-> { UsageLog.count }) { post_with_params }
     assert_response :internal_server_error
   end

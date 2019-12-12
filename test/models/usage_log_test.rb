@@ -11,7 +11,8 @@ class UsageLogTest < ActiveSupport::TestCase
     result = PseudonymisationResult.new(key: @key, variant: 1, demographics: @demographics, context: 'foo')
     @user = users(:test_user)
 
-    @log = @user.usage_logs.create_from_result!(result, remote_ip: '127.0.0.1')
+    @user.usage_logs.create_from_results!([result], remote_ip: '127.0.0.1')
+    @log = UsageLog.last
   end
 
   test 'should allow demographics to be assigned and decrypted' do
