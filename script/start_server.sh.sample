@@ -43,14 +43,14 @@ fi
 # Gather database credentials:
 echo Please enter the master key, to unlock the credentials bundle.
 echo ''
-[ -n "$RAILS_MASTER_KEY" ] || read -rep "RAILS_MASTER_KEY: " RAILS_MASTER_KEY
+[ -n "$RAILS_MASTER_KEY" ] || read -rsp "RAILS_MASTER_KEY: " RAILS_MASTER_KEY
 echo ''
 echo ''
 
 export RAILS_ENV="${RAILS_ENV:-production}"
 export RAILS_MASTER_KEY
 
-echo 'Checking flavour and credentials...'
+echo 'Checking credentials...'
 if (cd "$CURRENT" && bin/rails credentials:show > /dev/null 2>&1); then
   true
 else

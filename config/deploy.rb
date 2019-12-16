@@ -16,6 +16,9 @@ set :copy_exclude, %w[
 # Exclude gems from these bundler groups:
 set :bundle_without, %i[development test]
 
+# Custom shared paths, as we use credentials:
+set :shared_paths, %w[config/database.yml config/credentials.yml.enc log tmp]
+
 set :synchronise_sysadmin_scripts, true
 
 # This is an API-only application, so doesn't have any assets:
