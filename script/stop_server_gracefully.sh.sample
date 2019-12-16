@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# ===========================================================
+# DESCRIPTION:
+#   This script looks for an existing puma cluster, and
+#   tries to instruct it to stop. Puma will complete current
+#   requests, but not accept new ones.
+#
+# FIRST-TIME INSTALLATION:
+#   ...as per start_server.sh
+#
+# USAGE:
+#   sudo -i -u psuedo_live ./stop_server_gracefully.sh
+# ===========================================================
+
+PUMA_CMD=pumactl
+
+# Path to puma configuration, relative to deployment:
+PUMA_CONFIG=config/puma.rb
+
+CURRENT=$HOME/psuedonymisation_service/current
+
+if [ ! -e "$CURRENT" ]; then
+  echo Please configure CURRENT in this script!
+  exit 1
+fi
+
+if ! command -v $PUMA_CMD 2>&1 >/dev/null; then
+  echo "$PUMA_CMD not found in PATH!"
+  exit 1
+fi
+
+# Extract pidfile configuration:
+PIDFILE=`sed -nr "s/^pidfile\s+'([^']*)'$/\1/p" $CURRENT/$PUMA_CONFIG`
+
+# Stop puma cluster
+echo "Stopping puma... (pidfile: $CURRENT/$PIDFILE)"
+cd "$CURRENT" && $PUMA_CMD -P $PIDFILE stop

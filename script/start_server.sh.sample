@@ -1,0 +1,63 @@
+#!/bin/bash
+
+# ===========================================================
+# DESCRIPTION:
+#   This script prompts for various applications secrets that
+#   would otherwise have to be stored in the filesystem, like
+#   database credentials and secret_key_base, and exports
+#   them into the environment of the master puma process that
+#   it starts.
+#
+# USAGE:
+#   sudo -i -u pseudo_live ./start_server.sh
+#
+# PARAMS:
+#   These variables are exported by the script, and can be
+#   supplied in advance if needed:
+#
+#     +-------------------------+-----------------------+
+#     | variable                | default               |
+#     +-------------------------+-----------------------+
+#     | RAILS_MASTER_KEY        | none; required        |
+#     +-------------------------+-----------------------+
+#
+# ===========================================================
+
+PUMA_CMD=pumactl
+
+# Path to puma configuration, relative to deployment:
+PUMA_CONFIG=config/puma.rb
+
+CURRENT=$HOME/pseudonymisation_service/current
+
+if [ ! -e "$CURRENT" ]; then
+  echo Please configure CURRENT in this script!
+  exit 1
+fi
+
+if ! command -v $PUMA_CMD 2>&1 >/dev/null; then
+  echo "$PUMA_CMD not found in PATH!"
+  exit 1
+fi
+
+# Gather database credentials:
+echo Please enter the master key, to unlock the credentials bundle.
+echo ''
+[ -n "$RAILS_MASTER_KEY" ] || read -rep "RAILS_MASTER_KEY: " RAILS_MASTER_KEY
+echo ''
+echo ''
+
+export RAILS_ENV="${RAILS_ENV:-production}"
+export RAILS_MASTER_KEY
+
+echo 'Checking flavour and credentials...'
+if (cd "$CURRENT" && bin/rails credentials:show > /dev/null 2>&1); then
+  true
+else
+  echo "Unable to read credentials! Please check RAILS_MASTER_KEY"
+  exit 1
+fi
+
+# Start puma cluster, using the configuration committed:
+echo 'Starting puma...'
+cd "$CURRENT" && $PUMA_CMD -F $PUMA_CONFIG start
