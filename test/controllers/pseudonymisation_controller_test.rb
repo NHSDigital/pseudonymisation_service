@@ -216,6 +216,19 @@ class PseudonymisationControllerTest < ActionDispatch::IntegrationTest
     assert_forbidden 'unknown parameter(s): ["variant"]'
   end
 
+  test 'should return any additional demographics for linkage purposes' do
+    demographics = [
+      { 'nhs_number' => '0123456789', 'patientid' => '123' },
+      { 'nhs_number' => '1111111111', 'patientid' => '124' }
+    ]
+
+    post_with_params demographics: demographics, key_names: [@key1.name]
+    assert_response :success
+
+    data = response.parsed_body
+    assert_equal(demographics, data.map { |row| row['demographics'] })
+  end
+
   private
 
   def post_with_params(params = {})
