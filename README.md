@@ -36,6 +36,12 @@ and can be viewed/updated using:
 $ rails credentials:edit --environment test
 ```
 
+To supply the unlock key to an ad-hoc production rake task, you can use the following:
+
+```
+$ RAILS_ENV=production rails credentials:unlock do:some:admin:task
+```
+
 ## Authentication
 
 Users are authenticated with tokens supplied in the request headers.
