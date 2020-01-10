@@ -36,6 +36,17 @@ and can be viewed/updated using:
 $ rails credentials:edit --environment test
 ```
 
+To edit the credentials on the server (where the application user has read-only acces),
+you need to do the following (as a `deployer`, who can write to the filesystem):
+
+```
+$ export PATH="~pseudo_live/.rbenv/bin:~pseudo_live/.rbenv/shims:${PATH}"
+$ read -rsp '> ' RAILS_MASTER_KEY
+$ export RAILS_MASTER_KEY
+$ cd ~pseudo_live/pseudonymisation_service/current
+$ RAILS_ENV=production bundle exec rails credentials:edit
+```
+
 To supply the unlock key to an ad-hoc production rake task, you can use the following:
 
 ```

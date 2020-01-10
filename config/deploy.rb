@@ -42,7 +42,7 @@ before 'bundle:install', 'bundle:configure'
 
 TARGETS = [
   # env,   name,         app,     port,   app_user,     is_web_server
-  [:live, :psuedo_live, 'hermes', 28000, 'pseudo_live', true],
+  [:live, :pseudo_live, 'hermes', 28000, 'pseudo_live', true],
 ]
 
 TARGETS.each do |env, name, app, port, app_user, is_web_server|
