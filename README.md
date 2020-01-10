@@ -73,6 +73,10 @@ The service currently offers two endpoints, listed below.
 
 `GET` requests to `/keys` will return a JSON-encoded list of pseudonymisation keys availble to the current user.
 
+### GET /variants
+
+`GET` requests to `/variants` will return a JSON-encoded list of variants available to the current user, along with required demographic fields.
+
 ### POST /pseudonymise
 
 `POST` requests to `/pseudonymise` will return JSON-encoded pseudonymised identifiers for supplied `"demographics"`.
