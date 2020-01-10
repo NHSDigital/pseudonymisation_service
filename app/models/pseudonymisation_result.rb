@@ -1,14 +1,14 @@
-# A wrapper class responsible for holding demographics to be
+# A wrapper class responsible for holding identifiers to be
 # pseudonymised, facilitating that, and storing the result.
 class PseudonymisationResult
-  attr_reader :key, :variant, :demographics, :context
+  attr_reader :key, :variant, :identifiers, :context
 
-  delegate :nhs_number, :birth_date, :postcode, :input_pseudoid, to: :demographics
+  delegate :nhs_number, :birth_date, :postcode, :input_pseudoid, to: :identifiers
 
-  def initialize(key:, variant:, demographics:, context:)
+  def initialize(key:, variant:, identifiers:, context:)
     @key = key
     @variant = variant
-    @demographics = demographics
+    @identifiers = identifiers
     @context = context
   end
 
@@ -20,7 +20,7 @@ class PseudonymisationResult
     {
       key_name: @key.name,
       variant: @variant,
-      demographics: @demographics.to_h,
+      identifiers: @identifiers.to_h,
       context: context,
       pseudoid: pseudoid
     }

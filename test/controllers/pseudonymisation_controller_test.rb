@@ -14,12 +14,12 @@ class PseudonymisationControllerTest < ActionDispatch::IntegrationTest
     actual = response.parsed_body
     expected = [{ 'key_name' => 'Primary Key One',
                   'variant' => 1,
-                  'demographics' => { 'nhs_number' => '0123456789', 'postcode' => 'W1A 1AA', 'birth_date' => '2000-01-01' },
+                  'identifiers' => { 'nhs_number' => '0123456789', 'postcode' => 'W1A 1AA', 'birth_date' => '2000-01-01' },
                   'context' => 'testing',
                   'pseudoid' => 'b549045d4aaf639eaca7e543b4a725cd7bd441d3c59ecaed997786e8bb504a97' },
                 { 'key_name' => 'Primary Key One',
                   'variant' => 2,
-                  'demographics' => { 'nhs_number' => '0123456789', 'postcode' => 'W1A 1AA', 'birth_date' => '2000-01-01' },
+                  'identifiers' => { 'nhs_number' => '0123456789', 'postcode' => 'W1A 1AA', 'birth_date' => '2000-01-01' },
                   'context' => 'testing',
                   'pseudoid' => 'd7bc8a726b8110b09765db5b151b999f34b9c269301e82af6ce1d349c847374b' }]
 
@@ -27,13 +27,13 @@ class PseudonymisationControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'should use granted keys and variants to pseudonymise when given just NHS' do
-    post_with_params demographics: { nhs_number: '0123456789' }
+    post_with_params identifiers: { nhs_number: '0123456789' }
     assert_response :success
 
     actual = response.parsed_body
     expected = [{ 'key_name' => 'Primary Key One',
                   'variant' => 1,
-                  'demographics' => { 'nhs_number' => '0123456789' },
+                  'identifiers' => { 'nhs_number' => '0123456789' },
                   'context' => 'testing',
                   'pseudoid' => 'b549045d4aaf639eaca7e543b4a725cd7bd441d3c59ecaed997786e8bb504a97' }]
 
@@ -42,30 +42,30 @@ class PseudonymisationControllerTest < ActionDispatch::IntegrationTest
 
   test 'should use granted keys and variants to pseudonymise when given just an existing pseudoid' do
     input_pseudoid = 'd7bc8a726b8110b09765db5b151b999f34b9c269301e82af6ce1d349c847374b'
-    post_with_params demographics: { input_pseudoid: input_pseudoid }
+    post_with_params identifiers: { input_pseudoid: input_pseudoid }
     actual = response.parsed_body
     expected = [{ 'key_name' => 'RePseudo Key One',
                   'variant' => 3,
-                  'demographics' => { 'input_pseudoid' => input_pseudoid },
+                  'identifiers' => { 'input_pseudoid' => input_pseudoid },
                   'context' => 'testing',
                   'pseudoid' => 'ad6f477c55ea38092d1c4f94d242c50bd130fee3e41869ee1d367b83e9cae19f' }]
 
     assert_equal expected, actual, 'should have used "RePseudo Key One" and variant 3'
   end
 
-  test 'should return results for each demographic set received for bulk processing' do
-    post_with_params demographics: [{ nhs_number: '0123456789' }, { nhs_number: '1111111111' }]
+  test 'should return results for each identifier set received for bulk processing' do
+    post_with_params identifiers: [{ nhs_number: '0123456789' }, { nhs_number: '1111111111' }]
     assert_response :success
 
     actual = response.parsed_body
     expected = [{ 'key_name' => 'Primary Key One',
                   'variant' => 1,
-                  'demographics' => { 'nhs_number' => '0123456789' },
+                  'identifiers' => { 'nhs_number' => '0123456789' },
                   'context' => 'testing',
                   'pseudoid' => 'b549045d4aaf639eaca7e543b4a725cd7bd441d3c59ecaed997786e8bb504a97' },
                 { 'key_name' => 'Primary Key One',
                   'variant' => 1,
-                  'demographics' => { 'nhs_number' => '1111111111' },
+                  'identifiers' => { 'nhs_number' => '1111111111' },
                   'context' => 'testing',
                   'pseudoid' => '08f78e23b4783144726369a03289836cebff6a7e4d1b9d4d00f65e823ecf602a' }]
 
@@ -73,24 +73,24 @@ class PseudonymisationControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'an input issue when bulk processing should log nothing, and return no results' do
-    demographics = [{ nhs_number: '0123456789' }, { nhs_number: 'wibble' }]
+    identifiers = [{ nhs_number: '0123456789' }, { nhs_number: 'wibble' }]
 
     assert_no_difference(-> { UsageLog.count }) do
-      post_with_params demographics: demographics
+      post_with_params identifiers: identifiers
     end
     assert_forbidden 'no variants could be determined automatically, please specify explicitly'
 
     assert_no_difference(-> { UsageLog.count }) do
-      post_with_params demographics: demographics, variants: ['1']
+      post_with_params identifiers: identifiers, variants: ['1']
     end
-    assert_forbidden 'missing/invalid demographics: nhs_number'
+    assert_forbidden 'missing/invalid identifiers: nhs_number'
   end
 
   test 'a crash when bulk processing should log nothing, and return no results' do
     assert_no_difference(-> { UsageLog.count }) do
       pseudoid = SecureRandom.hex(32)
       PseudonymisationResult.any_instance.stubs(:pseudoid).returns(pseudoid).then.raises(StandardError)
-      post_with_params demographics: [{ nhs_number: '0123456789' }, { nhs_number: '1111111111' }]
+      post_with_params identifiers: [{ nhs_number: '0123456789' }, { nhs_number: '1111111111' }]
     end
 
     assert_response :internal_server_error
@@ -130,33 +130,33 @@ class PseudonymisationControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'should not allow specification of variant 1 without nhs number' do
-    post_with_params variants: ['1'], demographics: { nhs_number: '' }
-    assert_forbidden 'missing/invalid demographics: nhs_number'
+    post_with_params variants: ['1'], identifiers: { nhs_number: '' }
+    assert_forbidden 'missing/invalid identifiers: nhs_number'
 
-    post_with_params variants: ['1'], demographics: { birth_date: '2000-01-01' }
-    assert_forbidden 'missing/invalid demographics: nhs_number'
+    post_with_params variants: ['1'], identifiers: { birth_date: '2000-01-01' }
+    assert_forbidden 'missing/invalid identifiers: nhs_number'
   end
 
   test 'should not allow specification of variant 2 without postcode and DoB' do
     post_with_params variants: ['2']
     assert_response :success
 
-    post_with_params variants: ['2'], demographics: { birth_date: '2000-01-01', postcode: 'W1A 1AA' }
+    post_with_params variants: ['2'], identifiers: { birth_date: '2000-01-01', postcode: 'W1A 1AA' }
     assert_response :success
 
-    post_with_params variants: ['2'], demographics: { birth_date: '2000-01-01' }
-    assert_forbidden 'missing/invalid demographics: postcode'
+    post_with_params variants: ['2'], identifiers: { birth_date: '2000-01-01' }
+    assert_forbidden 'missing/invalid identifiers: postcode'
 
-    post_with_params variants: ['2'], demographics: { postcode: 'W1A 1AA' }
-    assert_forbidden 'missing/invalid demographics: birth_date'
+    post_with_params variants: ['2'], identifiers: { postcode: 'W1A 1AA' }
+    assert_forbidden 'missing/invalid identifiers: birth_date'
   end
 
   test 'should not allow specification of variant 3 without pseudoid' do
-    post_with_params variants: ['3'], demographics: { input_pseudoid: SecureRandom.hex(32) }, key_names: [@rekey1.name]
+    post_with_params variants: ['3'], identifiers: { input_pseudoid: SecureRandom.hex(32) }, key_names: [@rekey1.name]
     assert_response :success
 
-    post_with_params variants: ['3'], demographics: { nhs_number: '1111111111' }, key_names: [@rekey1.name]
-    assert_forbidden 'missing/invalid demographics: input_pseudoid'
+    post_with_params variants: ['3'], identifiers: { nhs_number: '1111111111' }, key_names: [@rekey1.name]
+    assert_forbidden 'missing/invalid identifiers: input_pseudoid'
   end
 
   test 'should not allow invalid variant / key combinations to be requested' do
@@ -169,9 +169,9 @@ class PseudonymisationControllerTest < ActionDispatch::IntegrationTest
     assert_forbidden 'unavailable variant requested'
   end
 
-  test 'should not allow requests without demographics' do
-    post_with_params demographics: {}
-    assert_forbidden "no value for 'demographics' was supplied"
+  test 'should not allow requests without identifiers' do
+    post_with_params identifiers: {}
+    assert_forbidden "no value for 'identifiers' was supplied"
   end
 
   test 'should not allow requests without context' do
@@ -189,26 +189,26 @@ class PseudonymisationControllerTest < ActionDispatch::IntegrationTest
     assert_forbidden "key 'wibble' is not available for use"
   end
 
-  test 'when given junk demographics without a variant, should say so' do
-    post_with_params demographics: { wibble: 'yes' }
+  test 'when given junk identifiers without a variant, should say so' do
+    post_with_params identifiers: { wibble: 'yes' }
     assert_forbidden 'no variants could be determined automatically, please specify explicitly'
 
-    post_with_params demographics: { wibble: 'yes' }, key_names: [@key1.name]
+    post_with_params identifiers: { wibble: 'yes' }, key_names: [@key1.name]
     assert_forbidden 'no variants could be determined automatically, please specify explicitly'
 
-    post_with_params demographics: { wibble: 'yes' }, variants: [1]
-    assert_forbidden 'missing/invalid demographics: nhs_number'
+    post_with_params identifiers: { wibble: 'yes' }, variants: [1]
+    assert_forbidden 'missing/invalid identifiers: nhs_number'
   end
 
-  test 'when supplying mismatched demographics/keys/variants, should not just return empty result set' do
-    post_with_params demographics: { nhs_number: '0123456789' }, key_names: [@rekey1.name]
-    assert_forbidden 'no valid demographic/key/variant combination could be found!'
+  test 'when supplying mismatched identifiers/keys/variants, should not just return empty result set' do
+    post_with_params identifiers: { nhs_number: '0123456789' }, key_names: [@rekey1.name]
+    assert_forbidden 'no valid identifier/key/variant combination could be found!'
 
-    post_with_params demographics: { nhs_number: '0123456789' }, key_names: [@rekey1.name], variants: [1]
+    post_with_params identifiers: { nhs_number: '0123456789' }, key_names: [@rekey1.name], variants: [1]
     assert_forbidden 'variant 1 not appropriate for a requested pseudonymisation key'
 
-    post_with_params demographics: { nhs_number: '0123456789' }, variants: [3]
-    assert_forbidden 'missing/invalid demographics: input_pseudoid'
+    post_with_params identifiers: { nhs_number: '0123456789' }, variants: [3]
+    assert_forbidden 'missing/invalid identifiers: input_pseudoid'
   end
 
   test 'should error when unkown top-level params are supplied' do
@@ -216,24 +216,24 @@ class PseudonymisationControllerTest < ActionDispatch::IntegrationTest
     assert_forbidden 'unknown parameter(s): ["variant"]'
   end
 
-  test 'should return any additional demographics for linkage purposes' do
-    demographics = [
+  test 'should return any additional identifiers for linkage purposes' do
+    identifiers = [
       { 'nhs_number' => '0123456789', 'patientid' => '123' },
       { 'nhs_number' => '1111111111', 'patientid' => '124' }
     ]
 
-    post_with_params demographics: demographics, key_names: [@key1.name]
+    post_with_params identifiers: identifiers, key_names: [@key1.name]
     assert_response :success
 
     data = response.parsed_body
-    assert_equal(demographics, data.map { |row| row['demographics'] })
+    assert_equal(identifiers, data.map { |row| row['identifiers'] })
   end
 
   private
 
   def post_with_params(params = {})
-    demographics = { nhs_number: '0123456789', postcode: 'W1A 1AA', birth_date: '2000-01-01' }
-    default_params = { context: 'testing', demographics: demographics }
+    identifiers = { nhs_number: '0123456789', postcode: 'W1A 1AA', birth_date: '2000-01-01' }
+    default_params = { context: 'testing', identifiers: identifiers }
     post pseudonymise_url, params: default_params.merge(params)
   end
 

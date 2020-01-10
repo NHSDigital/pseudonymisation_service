@@ -2,7 +2,7 @@
 #
 # If explicitly given keys and variants, will ensure they
 # make sense; otherwise, will determine a meaningful subset from
-# what the user has access to and what demographics were supplied.
+# what the user has access to and what identifiers were supplied.
 class PseudonymisationRequestService
   # Can be raised if invalid params supplied:
   class RequestError < StandardError; end
@@ -15,11 +15,11 @@ class PseudonymisationRequestService
     end
   end
 
-  # Raised when demographics required by a requested variant are missing,
+  # Raised when identifiers required by a requested variant are missing,
   # or invalid:
-  class MissingDemographics < RequestError
+  class MissingIndentifiers < RequestError
     def initialize(fields)
-      super "missing/invalid demographics: #{fields.to_sentence}"
+      super "missing/invalid identifiers: #{fields.to_sentence}"
     end
   end
 
@@ -30,10 +30,10 @@ class PseudonymisationRequestService
     end
   end
 
-  # Raised when the requested keys and supplied demographics do
+  # Raised when the requested keys and supplied identifiers do
   # not leave any plausible variants to compute. Explicitly requesting
   # variant(s) would provide more revealing details (e.g. invalid
-  # demographics information).
+  # identifiers information).
   class NoVariants < RequestError
     def initialize(message = nil)
       super(message || 'no variants could be determined automatically, please specify explicitly')
@@ -66,7 +66,7 @@ class PseudonymisationRequestService
   VARIANTS = [1, 2, 3].freeze
 
   # Supported parameters
-  KNOWN_PARAMETERS = %w[context demographics key_names variants].freeze
+  KNOWN_PARAMETERS = %w[context identifiers key_names variants].freeze
 
   attr_reader :user, :params, :errors
 
@@ -89,7 +89,7 @@ class PseudonymisationRequestService
     begin
       check_param_keys!
       context # check context
-      demographics # checks demographics
+      identifiers # checks identifiers
       keys # check keys
       variants # checks variants
     rescue RequestError => e
@@ -129,11 +129,11 @@ class PseudonymisationRequestService
     @context ||= params[:context].presence || raise(MissingKey, :context)
   end
 
-  def demographics
-    @demographics ||= begin
-      raise(MissingKey, :demographics) if params[:demographics].blank?
+  def identifiers
+    @identifiers ||= begin
+      raise(MissingKey, :identifiers) if params[:identifiers].blank?
 
-      DemographicsCollection.new(params[:demographics])
+      IdentifiersCollection.new(params[:identifiers])
     end
   end
 
@@ -146,20 +146,20 @@ class PseudonymisationRequestService
       variants = requested_variants.presence || VARIANTS.dup
       variants.each { |number| raise(UnknownVariantError) unless number.in?(VARIANTS) }
 
-      missing = requested_variants.flat_map { |number| demographics.missing_for_variant(number) }
-      raise(MissingDemographics, missing) if missing.any?
+      missing = requested_variants.flat_map { |number| identifiers.missing_for_variant(number) }
+      raise(MissingIndentifiers, missing) if missing.any?
 
       explicitly_invalid = requested_variants.select do |variant|
         requested_keys.any? && requested_keys.none? { |key| key.supports_variant?(variant) }
       end
       raise(InvalidVariant, explicitly_invalid) if explicitly_invalid.any?
 
-      # Remove any default choices that aren't compatible with supplied demographics:
-      variants.reject! { |number| demographics.missing_for_variant(number).any? }
+      # Remove any default choices that aren't compatible with supplied identifiers:
+      variants.reject! { |number| identifiers.missing_for_variant(number).any? }
       raise(NoVariants) if variants.none?
 
       unless keys.any? { |key| variants.any? { |variant| key.supports_variant?(variant) } }
-        raise(NoVariants, 'no valid demographic/key/variant combination could be found!')
+        raise(NoVariants, 'no valid identifier/key/variant combination could be found!')
       end
 
       variants
@@ -171,8 +171,8 @@ class PseudonymisationRequestService
       variants.map do |variant|
         next unless key.supports_variant?(variant)
 
-        demographics.each do |set|
-          attrs = { key: key, variant: variant, context: context, demographics: set }
+        identifiers.each do |set|
+          attrs = { key: key, variant: variant, context: context, identifiers: set }
           results << PseudonymisationResult.new(**attrs)
         end
       end
@@ -181,7 +181,7 @@ class PseudonymisationRequestService
 
   def instrument(results)
     NdrStats.count(:requests)
-    NdrStats.count(:demographics, demographics.count)
+    NdrStats.count(:identifiers, identifiers.count)
 
     results.group_by { |r| [r.key, r.variant] }.each do |(key, variant), chunk|
       NdrStats.count(:results, chunk.length, key_name: key.name, variant: variant)

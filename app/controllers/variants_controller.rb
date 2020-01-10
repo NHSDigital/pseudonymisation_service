@@ -7,7 +7,7 @@ class VariantsController < ApplicationController
     variants = @pseudonymisation_keys.flat_map(&:supported_variants).uniq
 
     items = variants.map do |variant|
-      { variant: variant, required_demographics: Demographics::VARIANT_FIELDS.fetch(variant) }
+      { variant: variant, required_identifiers: Identifiers::VARIANT_FIELDS.fetch(variant) }
     end
 
     render json: items

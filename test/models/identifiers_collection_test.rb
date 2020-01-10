@@ -1,19 +1,19 @@
 require 'test_helper'
 
-class DemographicsCollectionTest < ActiveSupport::TestCase
+class IdentifiersCollectionTest < ActiveSupport::TestCase
   setup do
     @set1 = { nhs_number: '0123456789' }
     @set2 = { nhs_number: '0123456789', postcode: 'CB22 3AB' }
 
-    @collection = DemographicsCollection.new([@set1, @set2])
+    @collection = IdentifiersCollection.new([@set1, @set2])
   end
 
-  test 'should iterate to return Demographics objects' do
+  test 'should iterate to return Identifiers objects' do
     array = @collection.to_a
 
     assert_equal 2, array.length
-    assert_equal Demographics.new(@set1), array[0]
-    assert_equal Demographics.new(@set2), array[1]
+    assert_equal Identifiers.new(@set1), array[0]
+    assert_equal Identifiers.new(@set2), array[1]
   end
 
   test 'should be valid if all members are valid' do

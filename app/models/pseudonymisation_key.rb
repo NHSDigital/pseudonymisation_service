@@ -1,7 +1,7 @@
 # Represents the secret pseudonymisation keys. The actual
 # secret salts are not stored in the database.
 #
-# Primary keys take in raw demographics, whereas secondary
+# Primary keys take in raw identifiers, whereas secondary
 # "repseudonymisation" keys operate on the output of other
 # keys. This results in a tree hierarchy.
 #
@@ -80,9 +80,9 @@ class PseudonymisationKey < ApplicationRecord
 
   # Each pseudonymisation key needs salt(s) to operate:
   #   salt1 is for pseudonymisation
-  #   salt2 is for encrypting demographics
+  #   salt2 is for encrypting identifiers
   #   salt3 (optional) is for encrypting clinical data
-  #   salt4 (optional) is for encrypting rawtext / mixed demographics and clinical data
+  #   salt4 (optional) is for encrypting rawtext / mixed identifiers and clinical data
   #   salt5 is for repseudonymising
   def salts
     self.class.salts.fetch(name.to_sym) { raise MissingSalt }

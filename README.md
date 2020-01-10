@@ -1,6 +1,6 @@
 # README
 
-The `pseudonymisation_service` project is a Rails API-only application that allows demographics to be submitted, and pseudonymised versions to be returned.
+The `pseudonymisation_service` project is a Rails API-only application that allows identifiers to be submitted, and pseudonymised versions to be returned.
 
 ## Usage
 
@@ -26,7 +26,7 @@ and any usage is then logged.
 
 This project uses Rails' per-environment credentials API. Stored using are:
 * pseudonymisation key secret salts
-* per-environment demographic-logging encryption keys
+* per-environment identifier-logging encryption keys
 * database credentials
 
 For testing, the test environment credentials file and key file have been committed,
@@ -75,9 +75,9 @@ The service currently offers two endpoints, listed below.
 
 ### GET /variants
 
-`GET` requests to `/variants` will return a JSON-encoded list of variants available to the current user, along with required demographic fields.
+`GET` requests to `/variants` will return a JSON-encoded list of variants available to the current user, along with required identifier fields.
 
 ### POST /pseudonymise
 
-`POST` requests to `/pseudonymise` will return JSON-encoded pseudonymised identifiers for supplied `"demographics"`.
+`POST` requests to `/pseudonymise` will return JSON-encoded pseudonymised identifiers for supplied `"identifiers"`.
 In addition, `"variants"` and `"key_names"` can be supplied, but if they are omitted sensible default choices are made.

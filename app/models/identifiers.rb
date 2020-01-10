@@ -1,5 +1,7 @@
-# Helper class to hold and validate supplied demographics
-class Demographics
+# Helper class to hold and validate supplied identifiers.
+#
+# Note that the API externally refers to identifiers as "identifiers".
+class Identifiers
   # Validate format of fields:
   PATTERNS = {
     nhs_number: /\A[0-9]{10}\z/,
