@@ -9,9 +9,12 @@ class PseudonymisationKeysControllerTest < ActionDispatch::IntegrationTest
     get pseudonymisation_keys_url
     assert_response :success
 
-    expected = PseudonymisationKey.accessible_by(current_user.ability).count
-    actual = response.parsed_body.length
-    assert_equal expected, actual
+    expected = PseudonymisationKey.accessible_by(current_user.ability)
+    actual = response.parsed_body
+
+    assert_equal expected.count, actual.count
+    assert_equal expected.pluck(:name).sort, actual.pluck('name').sort
+    assert_equal [[1, 2], [3]], actual.pluck('supported_variants').sort
   end
 
   test 'should not allow POST requests' do

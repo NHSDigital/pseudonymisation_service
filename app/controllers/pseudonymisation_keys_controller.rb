@@ -4,6 +4,9 @@ class PseudonymisationKeysController < ApplicationController
 
   # GET /api/v1/keys
   def index
-    render json: @pseudonymisation_keys
+    items = @pseudonymisation_keys.map do |key|
+      { name: key.name, supported_variants: key.supported_variants }
+    end
+    render json: items
   end
 end
