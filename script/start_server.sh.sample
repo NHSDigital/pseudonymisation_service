@@ -50,11 +50,19 @@ echo ''
 export RAILS_ENV="${RAILS_ENV:-production}"
 export RAILS_MASTER_KEY
 
-echo 'Checking credentials...'
+echo 'Checking master key...'
 if (cd "$CURRENT" && bin/rails credentials:show > /dev/null 2>&1); then
   true
 else
   echo "Unable to read credentials! Please check RAILS_MASTER_KEY"
+  exit 1
+fi
+
+echo 'Checking database connectivity...'
+if (cd "$CURRENT" && bin/rails runner 'User.count' > /dev/null 2>&1); then
+  true
+else
+  echo "Unable to connect to database! Please check DB status / credentials"
   exit 1
 fi
 
