@@ -76,6 +76,27 @@ $ rails users:grants:add[the_username]
 $ rails users:grants:revoke[the_username]
 ```
 
+## Key Generation
+
+To add new keys, first put salts into the `credentials.yml.enc`.
+Note that the application must be restarted to reload the encrypted credentials.
+
+Then, create `PseudonymistionKey` records from a Rails console:
+
+```ruby
+primary_key   = PseudonymisationKey.create!(name: 'primary_test_key')
+secondary_key = PseudonymisationKey.create!(name: 'repseudo_test_key', parent_key: primary_key)
+
+compound_key = PseudonymisationKey.create!(
+  key_type: 'compound',
+  name: 'compound_test_key',
+  start_key: primary_key,
+  end_key: secondary_key
+)
+```
+
+Grants can then be done using the `users:grants:add` task.
+
 ## Endpoints
 
 The service currently offers two endpoints, listed below.
