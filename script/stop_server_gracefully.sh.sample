@@ -10,7 +10,7 @@
 #   ...as per start_server.sh
 #
 # USAGE:
-#   sudo -i -u psuedo_live ./stop_server_gracefully.sh
+#   sudo -i -u pseudo_live ./stop_server_gracefully.sh
 # ===========================================================
 
 PUMA_CMD=pumactl
@@ -18,7 +18,7 @@ PUMA_CMD=pumactl
 # Path to puma configuration, relative to deployment:
 PUMA_CONFIG=config/puma.rb
 
-CURRENT=$HOME/psuedonymisation_service/current
+CURRENT=$HOME/pseudonymisation_service/current
 
 if [ ! -e "$CURRENT" ]; then
   echo Please configure CURRENT in this script!
