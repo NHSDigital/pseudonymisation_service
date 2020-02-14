@@ -17,7 +17,7 @@ set :copy_exclude, %w[
 set :bundle_without, %i[development test]
 
 # Custom shared paths, as we use credentials:
-set :shared_paths, %w[config/database.yml config/credentials.yml.enc log tmp]
+set :shared_paths, %w[config/database.yml config/credentials.yml.enc config/userlist.yml log tmp]
 
 set :synchronise_sysadmin_scripts, true
 
