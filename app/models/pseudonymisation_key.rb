@@ -66,7 +66,7 @@ class PseudonymisationKey < ApplicationRecord
     # All key salts are stored in environment-specific encrypted credentials
     # files, with each pseudonymisation key having an named entry.
     def salts
-      Array(Rails.application.credentials.pseudonymisation_keys)
+      Rails.application.credentials.pseudonymisation_keys || {}
     end
   end
 
