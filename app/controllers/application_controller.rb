@@ -19,6 +19,12 @@ class ApplicationController < ActionController::API
   def authenticate
     authenticate_or_request_with_http_token do |token, _options|
       @current_user = User.retrieve_by(token: token)
+
+      if current_user
+        Rails.logger.info("processing request for user: #{current_user.try(:username)}")
+      else
+        Rails.logger.info('processing request for unauthenticated user')
+      end
     end
   end
 
