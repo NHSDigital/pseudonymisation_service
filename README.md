@@ -5,7 +5,7 @@ The `pseudonymisation_service` project is a Rails API-only application that allo
 ## Usage
 
 The easiest way to use the pseudonymisation service is through a `NdrPseudonymise::Client` object,
-provided by the `ndr_pseudonymise` gem. This provides Ruby access to the two endpoints (described below, in "Endpoints").
+provided by the `ndr_pseudonymise` gem. This provides Ruby access to the three endpoints (described below, in "Endpoints").
 
 ## Basic Table Structure
 
