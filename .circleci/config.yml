@@ -37,3 +37,7 @@ jobs:
       - run:
           name:  Test suite
           command: bundle exec rake
+workflows:
+  build_and_test:
+    jobs:
+      - build_and_test
