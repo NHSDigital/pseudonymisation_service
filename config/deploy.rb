@@ -2,7 +2,8 @@ require 'bundler/capistrano'
 require 'ndr_dev_support/capistrano/ndr_model'
 
 set :application, 'pseudonymisation_service'
-set :repository_branches, 'https://deepthought/svn/'
+set :repository, 'https://github.com/publichealthengland/pseudonymisation_service'
+set :scm, :git
 
 # Exclude these files from the deployment:
 set :copy_exclude, %w[
@@ -26,6 +27,12 @@ set :asset_script, 'true'
 
 before 'ndr_dev_support:update_out_of_bundle_gems' do
   set :out_of_bundle_gems, webapp_deployment ? %w[puma nio4r] : %w[]
+end
+
+namespace :ndr_dev_support do
+  task :remove_svn_cache_if_needed do
+    # no-op now we're using GitHub / branches
+  end
 end
 
 namespace :bundle do

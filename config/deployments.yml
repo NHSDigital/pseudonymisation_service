@@ -1,4 +1,4 @@
 ---
 live:
   ruby: 2.6.3
-  branch: 'non-era/pseudonymisation_service'
+  branch: 'master'
