@@ -105,11 +105,83 @@ The service currently offers three endpoints, listed below.
 
 `GET` requests to `/keys` will return a JSON-encoded list of pseudonymisation keys availble to the current user.
 
+```
+curl -sH 'Authorization: Bearer user:token' site.dev/api/v1/keys
+```
+```json
+[
+  {
+    "name": "test key1",
+    "supported_variants": [
+      1,
+      2
+    ]
+  },
+  {
+    "name": "test key3",
+    "supported_variants": [
+      1,
+      2
+    ]
+  }
+]
+```
+
 ### GET /variants
 
 `GET` requests to `/variants` will return a JSON-encoded list of variants available to the current user, along with required identifier fields.
+
+```
+curl -sH 'Authorization: Bearer user:token' site.dev/api/v1/variants
+```
+```json
+[
+  {
+    "variant": 1,
+    "required_identifiers": [
+      "nhs_number"
+    ]
+  },
+  {
+    "variant": 2,
+    "required_identifiers": [
+      "birth_date",
+      "postcode"
+    ]
+  }
+]
+```
 
 ### POST /pseudonymise
 
 `POST` requests to `/pseudonymise` will return JSON-encoded pseudonymised identifiers for supplied `"identifiers"`.
 In addition, `"variants"` and `"key_names"` can be supplied, but if they are omitted sensible default choices are made.
+
+```
+curl -sH 'Authorization: Bearer user:token' \
+     --header "Content-Type:application/json" \
+     --data '{"identifiers":{"nhs_number":"1234567890"},"context":"README demo"}' \
+     site.dev/api/v1/pseudonymise
+```
+```json
+[
+  {
+    "key_name": "test key1",
+    "variant": 1,
+    "identifiers": {
+      "nhs_number": "1234567890"
+    },
+    "context": "README demo",
+    "pseudoid": "1e03fdf3..."
+  },
+  {
+    "key_name": "test key3",
+    "variant": 1,
+    "identifiers": {
+      "nhs_number": "1234567890"
+    },
+    "context": "README demo",
+    "pseudoid": "8cc142ecb..."
+  }
+]
+```
