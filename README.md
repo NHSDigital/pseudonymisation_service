@@ -1,8 +1,8 @@
 [![CircleCI](https://circleci.com/gh/publichealthengland/pseudonymisation_service.svg?style=shield)](https://app.circleci.com/pipelines/github/publichealthengland/pseudonymisation_service)
 
-# README
+# NDR Pseudonymisation Service
 
-The `pseudonymisation_service` project is a Rails API-only application that allows identifiers to be submitted, and pseudonymised versions to be returned.
+The `pseudonymisation_service` project is a Rails API-only application from PHE's National Disease Registration team that allows identifiers to be submitted, and pseudonymised versions to be returned.
 
 ## Usage
 
@@ -187,3 +187,19 @@ curl -sH 'Authorization: Bearer user:token' \
   }
 ]
 ```
+
+## Development
+
+After checking out the repo, run `bin/setup` to install dependencies, set up a database, and start a web server. You'll need to have PostgreSQL installed already.
+
+Tests can be run with `bin/rake`.
+
+## Contributing
+
+1. Fork it ( https://github.com/publichealthengland/pseudonymisation_service/fork )
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create a new Pull Request
+
+Please note that this project is released with a Contributor Code of Conduct. By participating in this project you agree to abide by its terms.
