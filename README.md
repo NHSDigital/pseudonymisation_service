@@ -99,7 +99,7 @@ Grants can then be done using the `users:grants:add` task.
 
 ## Endpoints
 
-The service currently offers two endpoints, listed below.
+The service currently offers three endpoints, listed below.
 
 ### GET /keys
 
