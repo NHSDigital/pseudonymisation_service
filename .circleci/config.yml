@@ -53,8 +53,8 @@ jobs:
           name: Brakeman
           command: bundle exec brakeman
       - run:
-          name: Test suite
-          command: bundle audit
+          name: Bundle audit
+          command: bundle exec bundle-audit
       - slack/status:
           channel: CSCHWSP53
 workflows:
