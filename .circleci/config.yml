@@ -25,6 +25,7 @@ jobs:
           name: Copy database.yml
           command: |
             cp .circleci/database.yml config/database.yml
+      - run: sudo apt update --fix-missing
       - run: sudo apt install -y postgresql-client || true
       - run: sudo apt install cmake
       - run:
