@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  slack: circleci/slack@3.4.2
+
 jobs:
   build_and_test:
     docker:
@@ -52,6 +55,8 @@ jobs:
       - run:
           name: Test suite
           command: bundle audit
+      - slack/status:
+          channel: CSCHWSP53
 workflows:
   build_and_test:
     jobs:
