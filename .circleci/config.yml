@@ -28,9 +28,17 @@ jobs:
       - run: sudo apt update --fix-missing
       - run: sudo apt install -y postgresql-client || true
       - run: sudo apt install cmake
+      - restore_cache:
+          keys:
+            - pseudonymisation-service-{{ checksum "Gemfile.lock" }}
+            - pseudonymisation-service-
       - run:
           name: Install dependencies
           command: bundle check --path=vendor/bundle || bundle install --path=vendor/bundle --jobs 4 --retry 3
+      - save_cache:
+          key: pseudonymisation-service-{{ checksum "Gemfile.lock" }}
+          paths:
+            - vendor/bundle
       - run:
           name: Database Setup
           command: |
