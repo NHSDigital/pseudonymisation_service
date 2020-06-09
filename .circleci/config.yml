@@ -36,8 +36,14 @@ jobs:
           command: |
             bundle exec rake db:setup
       - run:
-          name:  Test suite
+          name: Test suite
           command: bundle exec rake
+      - run:
+          name: Brakeman
+          command: bundle exec brakeman
+      - run:
+          name: Test suite
+          command: bundle audit
 workflows:
   build_and_test:
     jobs:
