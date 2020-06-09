@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/publichealthengland/pseudonymisation_service.svg?style=shield)](https://app.circleci.com/pipelines/github/publichealthengland/pseudonymisation_service)
+
 # README
 
 The `pseudonymisation_service` project is a Rails API-only application that allows identifiers to be submitted, and pseudonymised versions to be returned.
