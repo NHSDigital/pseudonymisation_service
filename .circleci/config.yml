@@ -33,9 +33,6 @@ jobs:
           name: Install dependencies
           command: bundle check --path=vendor/bundle || bundle install --path=vendor/bundle --jobs 4 --retry 3
       - run:
-          name: Install JS dependencies
-          command: yarn install
-      - run:
           name: Database Setup
           command: |
             bundle exec rake db:setup
