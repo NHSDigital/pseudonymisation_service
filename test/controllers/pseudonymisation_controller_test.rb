@@ -4,7 +4,7 @@ class PseudonymisationControllerTest < ActionDispatch::IntegrationTest
   setup do
     @key1 = pseudonymisation_keys(:primary_one)
     @key2 = pseudonymisation_keys(:primary_two)
-    @rekey1 = pseudonymisation_keys(:repseudo_one)
+    @rekey1 = pseudonymisation_keys(:standalone_repseudo_one)
   end
 
   test 'should use granted keys and variants to pseudonymise when given just NHS / DoB / postcode' do
@@ -44,7 +44,7 @@ class PseudonymisationControllerTest < ActionDispatch::IntegrationTest
     input_pseudoid = 'd7bc8a726b8110b09765db5b151b999f34b9c269301e82af6ce1d349c847374b'
     post_with_params identifiers: { input_pseudoid: input_pseudoid }
     actual = response.parsed_body
-    expected = [{ 'key_name' => 'RePseudo Key One',
+    expected = [{ 'key_name' => 'Standalone RePseudo One',
                   'variant' => 3,
                   'identifiers' => { 'input_pseudoid' => input_pseudoid },
                   'context' => 'testing',

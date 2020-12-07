@@ -23,3 +23,9 @@ compound_one:
   name: Compound Key One
   start_key: primary_one
   end_key: repseudo_one
+
+standalone_repseudo_one:
+  key_type: compound
+  name: Standalone RePseudo One
+  start_key: repseudo_one
+  end_key: repseudo_one

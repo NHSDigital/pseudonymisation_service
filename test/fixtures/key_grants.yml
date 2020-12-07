@@ -4,4 +4,4 @@ grant_one:
 
 grant_two:
   user: test_user
-  pseudonymisation_key: repseudo_one
+  pseudonymisation_key: standalone_repseudo_one
