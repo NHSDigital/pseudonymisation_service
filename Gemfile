@@ -22,7 +22,7 @@ gem 'cancancan'
 gem 'bootsnap', '>= 1.4.2', require: false
 
 # Provides pseudonymisation implementations:
-gem 'ndr_pseudonymise', '~> 0.3.0'
+gem 'ndr_pseudonymise', '~> 0.4.0'
 
 # Faster logging for bulk requests:
 gem 'activerecord-import'
