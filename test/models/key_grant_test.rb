@@ -14,20 +14,4 @@ class KeyGrantTest < ActiveSupport::TestCase
 
     assert_includes new_grant.user.pseudonymisation_keys, new_key
   end
-
-  test 'should only grant to primary pseudonymisation keys' do
-    grant = KeyGrant.new(user: users(:test_user))
-
-    grant.pseudonymisation_key = pseudonymisation_keys(:primary_two)
-    grant.valid?
-    refute_includes grant.errors.details[:pseudonymisation_key], error: 'not a primary pseudo key'
-
-    grant.pseudonymisation_key = pseudonymisation_keys(:repseudo_one)
-    grant.valid?
-    assert_includes grant.errors.details[:pseudonymisation_key], error: 'not a primary pseudo key'
-
-    grant.pseudonymisation_key = pseudonymisation_keys(:compound_one)
-    grant.valid?
-    refute_includes grant.errors.details[:pseudonymisation_key], error: 'not a primary pseudo key'
-  end
 end
