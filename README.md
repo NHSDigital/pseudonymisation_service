@@ -1,6 +1,4 @@
-[![CircleCI](https://circleci.com/gh/publichealthengland/pseudonymisation_service.svg?style=shield)](https://app.circleci.com/pipelines/github/publichealthengland/pseudonymisation_service)
-
-# NDR Pseudonymisation Service
+# NDR Pseudonymisation Service [![Build Status](https://github.com/publichealthengland/pseudonymisation_service/workflows/Test/badge.svg)](https://github.com/publichealthengland/pseudonymisation_service/actions?query=workflow%3Atest)
 
 The `pseudonymisation_service` project is a Rails API-only application from PHE's National Disease Registration team that allows identifiers to be submitted, and pseudonymised versions to be returned.
 
