@@ -85,8 +85,14 @@ jobs:
             username: 'CI',
             icon_emoji: ':hammer_and_wrench:',
             attachments: [{
-              color: '${{ needs.test_matrix.result }}' === 'success' ? 'good' : '${{ needs.test_matrix.result }}' === 'failure' ? 'danger' : 'warning',
-              text: `${process.env.AS_WORKFLOW} against \`${{ github.ref }}\` (${process.env.AS_COMMIT}) for ${{ github.actor }} resulted in *${{ needs.test_matrix.result }}*.`
+              color: '${{ needs.test.result }}' === 'success' ? 'good' : '${{ needs.test.result }}' === 'failure' ? 'danger' : 'warning',
+              text: `${process.env.AS_WORKFLOW} against \`${{ github.ref }}\` (${process.env.AS_COMMIT}) for ${{ github.actor }} resulted in *${{ needs.test.result }}*.`
+            },{
+              color: '${{ needs.brakeman.result }}' === 'success' ? 'good' : '${{ needs.brakeman.result }}' === 'failure' ? 'danger' : 'warning',
+              text: `Brakeman checks returned *${{ needs.brakeman.result }}*.`
+            },{
+              color: '${{ needs.bundle-audit.result }}' === 'success' ? 'good' : '${{ needs.bundle-audit.result }}' === 'failure' ? 'danger' : 'warning',
+              text: `Bundle Audit checks returned *${{ needs.bundle-audit.result }}*.`
             }]
           }
       env:
