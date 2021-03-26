@@ -12,10 +12,10 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0 # fetch everything
-    - name: Set up Ruby
+    - name: Set up Ruby + Bundle
       uses: ruby/setup-ruby@v1
-    - name: Install dependencies
-      run: bundle install
+      with:
+        bundler-cache: true
     - name: Run RuboCop against BASE..HEAD changes
       run: bundle exec rake rubocop:diff origin/${GITHUB_BASE_REF#*/}
 

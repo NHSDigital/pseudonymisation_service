@@ -28,10 +28,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Ruby
+    - name: Set up Ruby + Bundle
       uses: ruby/setup-ruby@v1
-    - name: Install dependencies
-      run: bundle install
+      with:
+        bundler-cache: true
     - name: Inject configuration
       run: cp config/database.yml{.ci,}
     - name: Prepare the database
@@ -44,10 +44,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Ruby
+    - name: Set up Ruby + Bundle
       uses: ruby/setup-ruby@v1
-    - name: Install dependencies
-      run: bundle install
+      with:
+        bundler-cache: true
     - name: Run Brakeman analysis
       run: bundle exec brakeman
 
@@ -56,10 +56,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Ruby
+    - name: Set up Ruby + Bundle
       uses: ruby/setup-ruby@v1
-    - name: Install dependencies
-      run: bundle install
+      with:
+        bundler-cache: true
     - name: Audit the bundle
       run: bundle exec bundle-audit check --update
 
