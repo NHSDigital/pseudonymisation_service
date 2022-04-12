@@ -19,7 +19,7 @@ gem 'highline'
 gem 'cancancan'
 
 # libxml wrapper:
-gem 'nokogiri', '~> 1.11'
+gem 'nokogiri', '~> 1.13'
 
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.4.2', require: false
