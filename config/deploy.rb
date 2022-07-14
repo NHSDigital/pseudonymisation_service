@@ -12,6 +12,7 @@ set :copy_exclude, %w[
   .svn/*
   config/deploy.rb
   test/*
+  vendor/cache/*-x86_64-darwin.gem
 ]
 
 # Exclude gems from these bundler groups:
