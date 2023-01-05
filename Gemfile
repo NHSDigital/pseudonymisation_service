@@ -5,6 +5,12 @@ ruby '3.0.4'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 6.1.0'
+
+# Support rails 6.1 with Ruby 3.1
+gem 'net-imap'
+gem 'net-pop'
+gem 'net-smtp'
+
 # Use postgresql as the database for Active Record
 # gem 'pg', '>= 0.18', '< 2.0'
 gem 'pg', '~> 1.2.3' # Support old CentOS 7 PostgreSQL client 9.2.24
