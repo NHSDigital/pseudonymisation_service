@@ -4,6 +4,14 @@ on: [push]
 
 jobs:
   test:
+    strategy:
+      matrix:
+        ruby-version:
+          - '3.0'
+          - '3.1'
+
+    name: Ruby ${{ matrix.ruby-version }}
+
     runs-on: ubuntu-latest
 
     services:
@@ -32,6 +40,7 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         bundler-cache: true
+        ruby-version: ${{ matrix.ruby-version }}
     - name: Inject configuration
       run: cp config/database.yml{.ci,}
     - name: Prepare the database
@@ -63,12 +72,24 @@ jobs:
     - name: Audit the bundle
       run: bundle exec bundle-audit check --update
 
+  # A utility job upon which Branch Protection can depend,
+  # thus remaining agnostic of the matrix.
+  test_matrix:
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    name: Matrix
+    needs: test
+    steps:
+    - name: Check build matrix status
+      if: ${{ needs.test.result != 'success' }}
+      run: exit 1
+
   notify:
     # Run only on master, but regardless of whether tests past:
     if: ${{ always() && github.ref == 'refs/heads/master' }}
 
     needs:
-      - test
+      - test_matrix
       - brakeman
       - bundle-audit
 
