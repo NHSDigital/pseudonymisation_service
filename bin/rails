@@ -1,6 +1,9 @@
 #!/usr/bin/env ruby
 begin
-  load File.expand_path('../spring', __FILE__)
+  # Spring will only activate if you've set PREFER_SPRING
+  # (e.g. in your bash profile).
+  # The default behaviour of DISABLE_SPRING will continue to work.
+  load File.expand_path('../spring', __FILE__) if ENV['PREFER_SPRING']
 rescue LoadError => e
   raise unless e.message.include?('spring')
 end
