@@ -109,10 +109,10 @@ GEM
       escape_utils (~> 1.2.0)
       mini_mime (~> 1.0)
       rugged (~> 1.0)
-    globalid (1.0.0)
+    globalid (1.0.1)
       activesupport (>= 5.0)
     highline (2.0.3)
-    i18n (1.10.0)
+    i18n (1.12.0)
       concurrent-ruby (~> 1.0)
     launchy (2.5.0)
       addressable (~> 2.7)
@@ -129,7 +129,7 @@ GEM
     method_source (1.0.0)
     mini_mime (1.1.2)
     mini_portile2 (2.8.0)
-    minitest (5.15.0)
+    minitest (5.17.0)
     mocha (1.14.0)
     msgpack (1.5.1)
     ndr_dev_support (7.0.0)
@@ -291,7 +291,7 @@ GEM
     with_clean_rbenv (0.1.0)
     xpath (3.2.0)
       nokogiri (~> 1.8)
-    zeitwerk (2.5.4)
+    zeitwerk (2.6.6)
 
 PLATFORMS
   ruby
