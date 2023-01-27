@@ -6,6 +6,9 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 6.1.0'
 
+# TODO: Remove this line after mail 2.8.1 is released
+gem 'mail', '>= 2.1.1', '< 2.8.0' # mail 2.8.0 and 2.8.0.1 have major hidden bugs
+
 # Support rails 6.1 with Ruby 3.1
 gem 'net-imap'
 gem 'net-pop'
