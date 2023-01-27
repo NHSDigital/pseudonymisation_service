@@ -14,6 +14,8 @@ gem 'net-imap'
 gem 'net-pop'
 gem 'net-smtp'
 
+gem 'date', '3.1.3' # Lock to Ruby 3.0 version of gem for live service
+
 # Use postgresql as the database for Active Record
 # gem 'pg', '>= 0.18', '< 2.0'
 gem 'pg', '~> 1.2.3' # Support old CentOS 7 PostgreSQL client 9.2.24
