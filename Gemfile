@@ -17,7 +17,7 @@ gem 'date', '3.1.3' # Lock to Ruby 3.0 version of gem for live service
 gem 'pg', '~> 1.3'
 # gem 'pg', '~> 1.2.3' # Support old CentOS 7 PostgreSQL client 9.2.24
 # Use Puma as the app server
-gem 'puma', '~> 4.1', '>= 4.3.5'
+gem 'puma', '~> 5.6'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 # gem 'jbuilder', '~> 2.7'
 # Compute secure password hashes:
