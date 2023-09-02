@@ -27,7 +27,7 @@ set :synchronise_sysadmin_scripts, true
 set :asset_script, 'true'
 
 before 'ndr_dev_support:update_out_of_bundle_gems' do
-  set :out_of_bundle_gems, webapp_deployment ? %w[puma nio4r] : %w[]
+  set :out_of_bundle_gems, webapp_deployment ? %w[puma puma-daemon rack nio4r] : %w[]
 end
 
 namespace :ndr_dev_support do
