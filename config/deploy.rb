@@ -12,6 +12,7 @@ set :copy_exclude, %w[
   .svn/*
   config/deploy.rb
   test/*
+  vendor/cache/*-arm64-darwin.gem
   vendor/cache/*-x86_64-darwin.gem
 ]
 
