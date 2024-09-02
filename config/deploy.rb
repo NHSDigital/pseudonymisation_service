@@ -37,6 +37,15 @@ namespace :ndr_dev_support do
   end
 end
 
+desc 'ensure additional configuration for CentOS deployments'
+task :centos_deployment_specifics do
+  # We'd like to do the following, but scl incorrectly handles double quotes in passed commands:
+  # set :default_shell, 'scl enable devtoolset-9 -- sh'
+  set :default_shell, <<~CMD.chomp
+    sh -c 'scl_run() { echo "$@" | scl enable devtoolset-9 -; }; scl_run "$@"'
+  CMD
+end
+
 namespace :bundle do
   desc 'Ensure bundler is properly configured'
   task :configure do
@@ -56,4 +65,8 @@ TARGETS = [
 
 TARGETS.each do |env, name, app, port, app_user, is_web_server|
   add_target(env, name, app, port, app_user, is_web_server)
+end
+
+%i[pseudo_live].each do |name|
+  after name, 'centos_deployment_specifics'
 end
