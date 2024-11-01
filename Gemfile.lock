@@ -136,7 +136,7 @@ GEM
     mocha (2.0.2)
       ruby2_keywords (>= 0.0.5)
     msgpack (1.6.0)
-    ndr_dev_support (7.2.4)
+    ndr_dev_support (7.2.5)
       activesupport (>= 6.1, < 7.2)
       brakeman (>= 4.7.1)
       bundler-audit
