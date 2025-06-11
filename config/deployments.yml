@@ -1,4 +1,4 @@
 ---
 live:
-  ruby: 3.1.6
+  ruby: 3.2.8
   branch: 'main'
