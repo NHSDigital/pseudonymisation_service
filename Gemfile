@@ -4,12 +4,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 # ruby '3.3.9'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 7.1.0'
-
-# Support rails 6.1 with Ruby 3.1
-gem 'net-imap'
-gem 'net-pop'
-gem 'net-smtp'
+gem 'rails', '~> 7.2.2'
 
 gem 'date', '3.1.3' # Lock to Ruby 3.0 version of gem for live service
 

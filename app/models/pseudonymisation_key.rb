@@ -9,7 +9,7 @@
 class PseudonymisationKey < ApplicationRecord
   class MissingSalt < StandardError; end
 
-  enum key_type: %i[singular compound]
+  enum :key_type, [:singular, :compound]
 
   with_options class_name: 'PseudonymisationKey' do
     with_options optional: true do
