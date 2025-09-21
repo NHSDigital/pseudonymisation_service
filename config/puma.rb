@@ -23,6 +23,10 @@ require 'puma/daemon'
 # be configured to provide at least as many connections as the number of
 # threads. This includes Active Record's `pool` parameter in `database.yml`.
 
+# Accept style conventions used in the Rails-generated template files
+# - otherwise we have to keep re-linting the files every time we upgrade Rails
+# rubocop:disable Style/RedundantFetchBlock
+
 max_threads_count = ENV.fetch('RAILS_MAX_THREADS') { 3 }
 min_threads_count = ENV.fetch('RAILS_MIN_THREADS') { max_threads_count }
 threads min_threads_count, max_threads_count
@@ -60,3 +64,5 @@ plugin :tmp_restart
 
 # Specify the PID file. Defaults to tmp/pids/server.pid in development.
 pidfile 'tmp/pids/server.pid'
+
+# rubocop:enable Style/RedundantFetchBlock

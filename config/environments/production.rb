@@ -5,7 +5,7 @@ Rails.application.configure do
 
   # Accept style conventions used in the Rails-generated template files
   # - otherwise we have to keep re-linting the files every time we upgrade Rails
-  # rubocop:disable Style/GlobalStdStream, Style/RedundantConstantBase
+  # rubocop:disable Style/GlobalStdStream, Layout/DotPosition, Layout/MultilineMethodCallIndentation, Style/RedundantConstantBase
 
   # Code is not reloaded between requests.
   config.enable_reloading = false
@@ -59,9 +59,9 @@ Rails.application.configure do
   #   .tap  { |logger| logger.formatter = ::Logger::Formatter.new }
   #   .then { |logger| ActiveSupport::TaggedLogging.new(logger) }
   if ENV['RAILS_LOG_TO_STDOUT'].present?
-    logger           = ActiveSupport::Logger.new(STDOUT)
-    logger.formatter = config.log_formatter
-    config.logger    = ActiveSupport::TaggedLogging.new(logger)
+    config.logger = ActiveSupport::Logger.new(STDOUT)
+      .tap  { |logger| logger.formatter = ::Logger::Formatter.new }
+      .then { |logger| ActiveSupport::TaggedLogging.new(logger) }
   end
 
   # Prepend all log lines with the following tags.
@@ -111,5 +111,5 @@ Rails.application.configure do
   # ]
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
-  # rubocop:enable Style/GlobalStdStream, Style/RedundantConstantBase
+  # rubocop:enable Style/GlobalStdStream, Layout/DotPosition, Layout/MultilineMethodCallIndentation, Style/RedundantConstantBase
 end
