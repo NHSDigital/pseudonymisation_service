@@ -3,6 +3,10 @@ require 'active_support/core_ext/integer/time'
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
+  # Accept style conventions used in the Rails-generated template files
+  # - otherwise we have to keep re-linting the files every time we upgrade Rails
+  # rubocop:disable Style/GlobalStdStream, Style/RedundantConstantBase
+
   # Code is not reloaded between requests.
   config.enable_reloading = false
 
@@ -107,4 +111,5 @@ Rails.application.configure do
   # ]
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+  # rubocop:enable Style/GlobalStdStream, Style/RedundantConstantBase
 end
