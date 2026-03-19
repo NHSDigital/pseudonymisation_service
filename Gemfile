@@ -19,7 +19,7 @@ gem 'puma-daemon', require: false # Installed out-of-bundle, managed by ndr_dev_
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 # gem 'jbuilder', '~> 2.7'
 # Compute secure password hashes:
-gem 'bcrypt', '~> 3.1.7'
+gem 'bcrypt', '~> 3.1.22'
 # Build interactive terminal prompts:
 gem 'highline'
 # Authorisation library:
