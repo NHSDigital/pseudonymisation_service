@@ -11,3 +11,9 @@ updates:
       interval: "daily"
     vendor: true
     open-pull-requests-limit: 0 # Disable gem updates. Does not affect security updates.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    cooldown:
+      default-days: 7 # Wait 7 days after publication
