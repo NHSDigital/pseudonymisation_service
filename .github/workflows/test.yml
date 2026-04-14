@@ -36,9 +36,9 @@ jobs:
       DB_PASSWORD: rails_password
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # actions/checkout@v6 see https://github.com/actions/checkout/releases/tag/v6
     - name: Set up Ruby + Bundle
-      uses: ruby/setup-ruby@v1
+      uses: ruby/setup-ruby@4c56a21280b36d862b5fc31348f463d60bdc55d5 # ruby/setup-ruby@v1 see https://github.com/ruby/setup-ruby/tree/v1
       with:
         bundler-cache: true
         ruby-version: ${{ matrix.ruby-version }}
@@ -53,9 +53,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # actions/checkout@v6 see https://github.com/actions/checkout/releases/tag/v6
     - name: Set up Ruby + Bundle
-      uses: ruby/setup-ruby@v1
+      uses: ruby/setup-ruby@4c56a21280b36d862b5fc31348f463d60bdc55d5 # ruby/setup-ruby@v1 see https://github.com/ruby/setup-ruby/tree/v1
       with:
         bundler-cache: true
     - name: Run Brakeman analysis
@@ -65,9 +65,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # actions/checkout@v6 see https://github.com/actions/checkout/releases/tag/v6
     - name: Set up Ruby + Bundle
-      uses: ruby/setup-ruby@v1
+      uses: ruby/setup-ruby@4c56a21280b36d862b5fc31348f463d60bdc55d5 # ruby/setup-ruby@v1 see https://github.com/ruby/setup-ruby/tree/v1
       with:
         bundler-cache: true
     - name: Audit the bundle
@@ -85,37 +85,37 @@ jobs:
       if: ${{ needs.test.result != 'success' }}
       run: exit 1
 
-  notify:
-    # Run only on master, but regardless of whether tests past:
-    if: ${{ always() && github.ref == 'refs/heads/master' }}
-
-    needs:
-      - test_matrix
-      - brakeman
-      - bundle-audit
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: 8398a7/action-slack@v3
-      with:
-        status: custom
-        fields: workflow,commit,author
-        custom_payload: |
-          {
-            channel: 'CSCHWSP53',
-            username: 'CI',
-            icon_emoji: ':hammer_and_wrench:',
-            attachments: [{
-              color: '${{ needs.test.result }}' === 'success' ? 'good' : '${{ needs.test.result }}' === 'failure' ? 'danger' : 'warning',
-              text: `${process.env.AS_WORKFLOW} against \`${{ github.ref }}\` (${process.env.AS_COMMIT}) for ${{ github.actor }} resulted in *${{ needs.test.result }}*.`
-            },{
-              color: '${{ needs.brakeman.result }}' === 'success' ? 'good' : '${{ needs.brakeman.result }}' === 'failure' ? 'danger' : 'warning',
-              text: `Brakeman checks returned *${{ needs.brakeman.result }}*.`
-            },{
-              color: '${{ needs.bundle-audit.result }}' === 'success' ? 'good' : '${{ needs.bundle-audit.result }}' === 'failure' ? 'danger' : 'warning',
-              text: `Bundle Audit checks returned *${{ needs.bundle-audit.result }}*.`
-            }]
-          }
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+#  notify:
+#    # Run only on master, but regardless of whether tests past:
+#    if: ${{ always() && github.ref == 'refs/heads/master' }}
+#
+#    needs:
+#      - test_matrix
+#      - brakeman
+#      - bundle-audit
+#
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#    - uses: 8398a7/action-slack@v3
+#      with:
+#        status: custom
+#        fields: workflow,commit,author
+#        custom_payload: |
+#          {
+#            channel: 'CSCHWSP53',
+#            username: 'CI',
+#            icon_emoji: ':hammer_and_wrench:',
+#            attachments: [{
+#              color: '${{ needs.test.result }}' === 'success' ? 'good' : '${{ needs.test.result }}' === 'failure' ? 'danger' : 'warning',
+#              text: `${process.env.AS_WORKFLOW} against \`${{ github.ref }}\` (${process.env.AS_COMMIT}) for ${{ github.actor }} resulted in *${{ needs.test.result }}*.`
+#            },{
+#              color: '${{ needs.brakeman.result }}' === 'success' ? 'good' : '${{ needs.brakeman.result }}' === 'failure' ? 'danger' : 'warning',
+#              text: `Brakeman checks returned *${{ needs.brakeman.result }}*.`
+#            },{
+#              color: '${{ needs.bundle-audit.result }}' === 'success' ? 'good' : '${{ needs.bundle-audit.result }}' === 'failure' ? 'danger' : 'warning',
+#              text: `Bundle Audit checks returned *${{ needs.bundle-audit.result }}*.`
+#            }]
+#          }
+#      env:
+#        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
