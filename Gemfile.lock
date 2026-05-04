@@ -203,7 +203,7 @@ GEM
       activesupport
     ndr_stats (0.2.2)
       dogstatsd-ruby (~> 4.5)
-    net-imap (0.5.9)
+    net-imap (0.5.14)
       date
       net-protocol
     net-pop (0.1.2)
@@ -351,7 +351,7 @@ GEM
       spring (>= 4)
     stringio (3.1.1)
     thor (1.4.0)
-    timeout (0.4.3)
+    timeout (0.6.1)
     tsort (0.2.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
