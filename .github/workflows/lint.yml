@@ -13,7 +13,7 @@ jobs:
       with:
         fetch-depth: 0 # fetch everything
     - name: Set up Ruby + Bundle
-      uses: ruby/setup-ruby@6aaa311d81eba98ae12eaffbcb63296ace0efcde # ruby/setup-ruby@v1 see https://github.com/ruby/setup-ruby/tree/v1
+      uses: ruby/setup-ruby@afeafc3d1ab54a631816aba4c914a0081c12ff2f # ruby/setup-ruby@v1 see https://github.com/ruby/setup-ruby/tree/v1
       with:
         bundler-cache: true
     - name: Run RuboCop against BASE..HEAD changes
