@@ -13,7 +13,7 @@ gem 'pg', '~> 1.4.6' # All client instance have postgres version >= 9.3
 # gem 'pg', '~> 1.2.3' # Support old CentOS 7 PostgreSQL client 9.2.24
 
 # Use Puma as the app server
-gem 'puma', '~> 6.0' # Installed out-of-bundle, managed by ndr_dev_support
+gem 'puma', '~> 7.0' # Installed out-of-bundle, managed by ndr_dev_support
 gem 'puma-daemon', require: false # Installed out-of-bundle, managed by ndr_dev_support
 
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
